@@ -1,0 +1,19 @@
+.campgroundCatalogContainer {
+    position: relative;
+    max-width: 100%;
+}
+
+.campground-catalog-container h2 {
+    font-size: 1.25rem;
+    color: #333;
+}
+
+button {
+    padding: 0.5rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+button:focus {
+    outline: none;
+}

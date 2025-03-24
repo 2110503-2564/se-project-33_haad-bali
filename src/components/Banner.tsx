@@ -29,18 +29,11 @@ export default function Banner () {
                     Book the perfect venue for your event—hassle-free and tailored to your needs!
                 </h3>
             </div>
-            {
-                session ? (
-                    <div className="z-30 absolute top-5 left-5 font-semibold text-cyan-200 text-xl">
-                        Welcome {session.user?.name}
-                    </div>
-                ) : null
-            }
             <button 
                 className="z-30 absolute bottom-5 left-10 bg-black text-white  font-semibold py-2 px-4 rounded-3xl hover:bg-white hover:text-black hover:border-transparent"
                 onClick={(e) => { 
                     e.stopPropagation(); 
-                    router.push('/venue');
+                    router.push('/campgrounds');
                 }}
             >
                 Select Venue

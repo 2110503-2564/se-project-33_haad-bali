@@ -17,6 +17,7 @@ export default async function TopMenu() {
                     width={0}
                     height={0}
                     sizes="100vh"
+                    
                 />
             </div>
             <div className={styles.rightSection}>
