@@ -1,4 +1,3 @@
-// authOptions.ts
 import { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import userLogin from "@/libs/userLogin"; // This is the function that handles login logic
@@ -40,6 +39,17 @@ export const authOptions: AuthOptions = {
         email: token.email,
       };
       return session;
+    },
+    async signIn({ user }) {
+      if (user) {
+        // Redirect to home after successful sign-in
+        return true;
+      }
+      return false; // In case the user is not valid
+    },
+    async redirect({ url, baseUrl }) {
+      // After sign-in or sign-out, redirect to the home page
+      return baseUrl + "/home"; // Customize this redirect if necessary
     },
   },
 };

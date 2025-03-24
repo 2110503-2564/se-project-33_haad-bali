@@ -34,7 +34,7 @@ export default function Register() {
       
       if (res.success) {
         // Redirect to login page on successful registration
-        router.push("/login");  // This ensures the user goes to login after successful registration
+        router.push("/api/auth/signin");  // This ensures the user goes to login after successful registration
       } else {
         setErrorMessage(res.message || "Registration failed. Please try again.");
       }
