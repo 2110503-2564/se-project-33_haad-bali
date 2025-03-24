@@ -20,9 +20,11 @@ export interface CammpgroundsJson {
 }
 
 export interface BookingItem {
+    checkInDate: string | number | Date;
   nameLastname: string;
+    _id: string,
   tel: string;
-  campground: string;
+  campground: CamgroundItem;
   checkInDate: string;   // Added check-in date
   checkOutDate: string;  // Added check-out date
   breakfast: boolean;    // Added breakfast option

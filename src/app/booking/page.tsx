@@ -33,6 +33,13 @@ export default function Booking() {
   const [campgroundHasBreakfast, setCampgroundHasBreakfast] = useState<boolean>(false); // Track if selected campground has breakfast
   const [campgrounds, setCampgrounds] = useState<CampgroundItem[]>([]); // Use the correct CampgroundItem type
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  
+  // Add validation states for each required field
+  const [nameError, setNameError] = useState<string>('');
+  const [telError, setTelError] = useState<string>('');
+  const [checkInError, setCheckInError] = useState<string>('');
+  const [checkOutError, setCheckOutError] = useState<string>('');
+  const [locationError, setLocationError] = useState<string>('');
 
   // Fetch campgrounds data
   useEffect(() => {
@@ -92,6 +99,10 @@ export default function Booking() {
         // Set checkout date to check-in date + 3 days
         setCheckOutDate(checkInDate.add(3, 'day'));
       }
+      
+      // Clear any previous date errors once valid dates are selected
+      setCheckInError('');
+      setCheckOutError('');
     } else {
       setStayDuration(0);
     }
@@ -107,6 +118,8 @@ export default function Booking() {
       const selectedCampground = campgrounds.find(camp => camp.id === locationId);
       if (selectedCampground) {
         setCampgroundHasBreakfast(selectedCampground.breakfast === true);
+        // Clear location error when valid selection is made
+        setLocationError('');
       } else {
         setCampgroundHasBreakfast(false);
       }
@@ -128,61 +141,122 @@ export default function Booking() {
         toast.warning("Maximum stay duration is 3 nights.");
       } else {
         setCheckOutDate(date);
+        setCheckOutError(''); // Clear error when valid date selected
       }
     } else {
       setCheckOutDate(date);
     }
   };
 
-  const makeBooking = async () => {
-    if (bookLocation && checkInDate && checkOutDate && nameLastname && tel) {
-      // Final validation before booking
-      const nights = checkOutDate.diff(checkInDate, 'day');
-      if (nights > 3) {
-        toast.error("Booking failed. Maximum stay is 3 nights.");
-        return;
-      }
-      
-      // Find the selected campground
+  // Validate all form fields
+  const validateForm = (): boolean => {
+    let isValid = true;
+    
+    // Check name
+    if (!nameLastname.trim()) {
+      setNameError('Name is required');
+      toast.error('Please enter your name');
+      isValid = false;
+    } else {
+      setNameError('');
+    }
+    
+    // Check telephone
+    if (!tel.trim()) {
+      setTelError('Telephone number is required');
+      toast.error('Please enter a telephone number');
+      isValid = false;
+    } else {
+      setTelError('');
+    }
+    
+    // Check check-in date
+    if (!checkInDate) {
+      setCheckInError('Check-in date is required');
+      toast.error('Please select a check-in date');
+      isValid = false;
+    } else {
+      setCheckInError('');
+    }
+    
+    // Check check-out date
+    if (!checkOutDate) {
+      setCheckOutError('Check-out date is required');
+      toast.error('Please select a check-out date');
+      isValid = false;
+    } else {
+      setCheckOutError('');
+    }
+    
+    // Check location
+    if (!bookLocation) {
+      setLocationError('Please select a campground');
+      toast.error('Please select a campground location');
+      isValid = false;
+    } else {
       const selectedCampground = campgrounds.find(camp => camp.id === bookLocation);
       if (!selectedCampground) {
-        toast.error("Invalid campground selection.");
-        return;
+        setLocationError('Please select a valid campground');
+        toast.error('Invalid campground selection');
+        isValid = false;
+      } else {
+        setLocationError('');
       }
-      
-      const items: BookingItem = {
-        nameLastname: nameLastname,
-        tel: tel,
-        campground: selectedCampground.name, // Use campground name from data
-        checkInDate: checkInDate.format("YYYY-MM-DD"),
-        checkOutDate: checkOutDate.format("YYYY-MM-DD"),
-        breakfast: campgroundHasBreakfast ? breakfast : false, // Only include breakfast if available
-      };
+    }
+    
+    return isValid;
+  };
 
-      // Dispatching the booking details
-      dispatch(addBooking(items));
+  const makeBooking = async () => {
+    // Validate all fields before proceeding
+    if (!validateForm()) {
+      return;
+    }
+    
+    // Final validation before booking
+    const nights = checkOutDate!.diff(checkInDate!, 'day');
+    if (nights > 3) {
+      toast.error("Booking failed. Maximum stay is 3 nights.");
+      return;
+    }
+    
+    // Find the selected campground
+    const selectedCampground = campgrounds.find(camp => camp.id === bookLocation);
+    if (!selectedCampground) {
+      toast.error("Invalid campground selection.");
+      return;
+    }
+    
+    const items: BookingItem = {
+      nameLastname: nameLastname,
+      tel: tel,
+      campground: selectedCampground.name, // Use campground name from data
+      checkInDate: checkInDate!.format("YYYY-MM-DD"),
+      checkOutDate: checkOutDate!.format("YYYY-MM-DD"),
+      breakfast: campgroundHasBreakfast ? breakfast : false, // Only include breakfast if available
+    };
 
-      // Send booking request to backend
-      try {
-        const response = await fetch(`http://localhost:5000/api/v1/bookings`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(items),
-        });
-        const data = await response.json();
+    // Dispatching the booking details
+    dispatch(addBooking(items));
 
-        if (data.success) {
-          alert(data.message || "Booking successful!");
-        } else {
-          alert(data.message || "Booking failed!");
-        }
-      } catch (error) {
-        alert("An error occurred while making the booking.");
+    // Send booking request to backend
+    try {
+      const response = await fetch(`/api/bookings/${vid}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(items),
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success(data.message || "Booking successful!");
+      } else {
+        toast.error(data.message || "Booking failed!");
       }
-    } else {
-      alert("Please fill in all fields.");
+    } catch (error) {
+      toast.error("An error occurred while making the booking.");
     }
   };
 
@@ -227,7 +301,13 @@ export default function Booking() {
           variant="standard"
           className="w-[550px] rounded-lg bg-white"
           value={nameLastname}
-          onChange={(e) => setNameLastname(e.target.value)}
+          onChange={(e) => {
+            setNameLastname(e.target.value);
+            if (e.target.value.trim()) setNameError('');
+          }}
+          error={!!nameError}
+          helperText={nameError}
+          required
         />
       </div>
 
@@ -239,24 +319,41 @@ export default function Booking() {
           variant="standard"
           className="w-[550px] rounded-lg bg-white"
           value={tel}
-          onChange={(e) => setTel(e.target.value)}
+          onChange={(e) => {
+            setTel(e.target.value);
+            if (e.target.value.trim()) setTelError('');
+          }}
+          error={!!telError}
+          helperText={telError}
+          required
         />
       </div>
 
       {/* Date Picker for Check-in and Check-out */}
-      <DatePickerComponent
-        label="Check-in Date"
-        value={checkInDate}
-        onDateChange={setCheckInDate}
-        minDate={dayjs()} // Set minimum date to today's date for Check-in
-      />
+      <div className="w-fit">
+        <DatePickerComponent
+          label="Check-in Date"
+          value={checkInDate}
+          onDateChange={(date) => {
+            setCheckInDate(date);
+            if (date) setCheckInError('');
+          }}
+          minDate={dayjs()} // Set minimum date to today's date for Check-in
+          required
+        />
+        {checkInError && <div className="text-red-500 text-sm">{checkInError}</div>}
+      </div>
 
-      <DatePickerComponent
-        label="Check-out Date"
-        value={checkOutDate}
-        onDateChange={handleCheckoutDateChange}
-        minDate={checkInDate} // Enforce Check-out date restriction
-      />
+      <div className="w-fit">
+        <DatePickerComponent
+          label="Check-out Date"
+          value={checkOutDate}
+          onDateChange={handleCheckoutDateChange}
+          minDate={checkInDate} // Enforce Check-out date restriction
+          required
+        />
+        {checkOutError && <div className="text-red-500 text-sm">{checkOutError}</div>}
+      </div>
 
       {/* Stay Duration Information */}
       {checkInDate && checkOutDate && (
@@ -272,18 +369,22 @@ export default function Booking() {
         {isLoading ? (
           <div className="w-[550px] h-10 flex items-center justify-center">Loading campgrounds...</div>
         ) : (
-          <select
-            className="w-[550px] h-10 border rounded-lg bg-white px-2"
-            value={bookLocation}
-            onChange={(e) => handleLocationChange(e.target.value)}
-          >
-            <option value="">Select Campground</option>
-            {campgrounds.map((camp) => (
-              <option key={camp.id} value={camp.id}>
-                {camp.name}
-              </option>
-            ))}
-          </select>
+          <div className="w-[550px]">
+            <select
+              className={`w-full h-10 border rounded-lg bg-white px-2 ${locationError ? 'border-red-500' : ''}`}
+              value={bookLocation}
+              onChange={(e) => handleLocationChange(e.target.value)}
+              required
+            >
+              <option value="">Select Campground</option>
+              {campgrounds.map((camp) => (
+                <option key={camp.id} value={camp.id}>
+                  {camp.name}
+                </option>
+              ))}
+            </select>
+            {locationError && <div className="text-red-500 text-sm">{locationError}</div>}
+          </div>
         )}
       </div>
 
@@ -303,7 +404,7 @@ export default function Booking() {
         onClick={makeBooking}
         disabled={stayDuration > 3 || isLoading}
       >
-        Book Campground
+        Book Venue
       </button>
     </main>
   );
