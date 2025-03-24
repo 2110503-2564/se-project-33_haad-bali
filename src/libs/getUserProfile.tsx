@@ -1,5 +1,5 @@
 import { METHODS } from "http";
-import { CammpgroundsJson } from "../../interface";
+import { CampgroundsJson } from "../../interface";
 import { headers } from "next/headers";
 
 export default async function getUserProfile(token: string) {
