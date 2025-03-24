@@ -23,7 +23,8 @@ export default function Booking() {
     const [bookLocation, setBookLocation] = useState<string>("");
     const [nameLastname, setNameLastname] = useState<string>(""); 
     const [tel, setTel] = useState<string>("");  
-    const [user, setUser] = useState<{ name: string; email: string; tel: string; createdAt: string } | null>(null);
+    const [user, setUser] = useState<{ name: string; username:string; email: string; tel: string; createdAt: string } | null>(null);
+
 
     // ดึงข้อมูลผู้ใช้
     useEffect(() => {
@@ -35,8 +36,9 @@ export default function Booking() {
                 const profile = await getUserProfile(token);
                 setUser({
                     name: profile.data.name,
+                    username:profile.data.username,
                     email: profile.data.email,
-                    tel: profile.data.tel,
+                    tel: profile.data.telephone,
                     createdAt: profile.data.createdAt,
                 });
 
@@ -71,6 +73,14 @@ export default function Booking() {
             {user && (
                 <table className="table-auto border-separate border-spacing-2">
                     <tbody>
+                    <tr>
+                            <td className="font-semibold">Name</td>
+                            <td>{user.name}</td>
+                        </tr>
+                        <tr>
+                            <td className="font-semibold">Username</td>
+                            <td>{user.username}</td>
+                        </tr>
                         <tr>
                             <td className="font-semibold">Email</td>
                             <td>{user.email}</td>

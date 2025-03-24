@@ -1,40 +1,50 @@
 'use client'
-import styles from './banner.module.css';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 
 export default function Banner () {
-    const covers = ['/img/cover.jpg','/img/cover2.jpg', '/img/cover3.jpg', '/img/cover4.jpg'];
-    const [index, setIndex] = useState(0);
-    const router = useRouter();
-    const {data:session} = useSession();
-    console.log(session)
-    
-    return (
-        <div className={styles.banner} onClick={() => { setIndex(index+1) }}>
-            <Image src={covers[index%4]} 
-            alt='cover'
-            fill={true}
-            objectFit= 'cover'
-            priority
+    const covers = ['/img/cover.jpg','/img/cover2.jpg','/img/cover3.jpg','/img/cover4.jpg']
+    const [index, setIndex] = useState(0)
+    const router = useRouter()
+
+    const { data: session } = useSession()
+
+    return(
+        <div className="relative w-full h-96" onClick={() => setIndex(index + 1)}>
+            <Image 
+                src={covers[index % 4]} 
+                alt='cover' 
+                fill={true} 
+                priority
+                objectFit='cover'
+                className="absolute top-0 left-0 w-full h-full"
             />
-            <div className={styles.bannerText}>
-                <h1 className='text-4xl font-bold font-serif text-white'>Where every event finds its venue</h1>
-                <h3 className='text-xl font-serif text-white'>Your Events, Our Venue</h3>
+            <div className="absolute top-1/2 left-10 transform -translate-y-1/2">
+                <h1 className="drop-shadow-lg text-5xl bottom-10 font-bold text-white break-words max-w-xs"> {/* Increased font size and wrapping */}
+                    Where every event finds its venue
+                </h1>
+                <h3 className="drop-shadow-2xl text-m text-white mt-2 break-words max-w-xs"> {/* Ensures long text wraps */}
+                    Book the perfect venue for your event—hassle-free and tailored to your needs!
+                </h3>
             </div>
             {
-                session? <div className={styles.bannerTexta}> <div className='text-4xl font-bold font-serif text-white '>
-                Welcome {session.user?.name}</div></div>:null
+                session ? (
+                    <div className="z-30 absolute top-5 left-5 font-semibold text-cyan-200 text-xl">
+                        Welcome {session.user?.name}
+                    </div>
+                ) : null
             }
-            <button className='bg-[#501717] text-white border border-[#501717]
-                font-semibold font-serif py-2 px-2 m-2 rounded z-30 absolute bottom-0 right-0
-                hover:bg-[#731f1f] hover:text-white'
-                onClick={(e) => {e.stopPropagation; router.push('/campgrounds') }}>
-                Select Your Campground NOW
+            <button 
+                className="z-30 absolute bottom-5 left-10 bg-black text-white  font-semibold py-2 px-4 rounded-3xl hover:bg-white hover:text-black hover:border-transparent"
+                onClick={(e) => { 
+                    e.stopPropagation(); 
+                    router.push('/venue');
+                }}
+            >
+                Select Venue
             </button>
-        </div> 
+        </div>
     );
 }
-
