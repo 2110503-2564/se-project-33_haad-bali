@@ -9,12 +9,17 @@ export default function DatePickerComponent({
   value,
   onDateChange,
   minDate,
+  required = false, // Default to false if not provided
 }: {
   label: string;
   value: Dayjs | null;
   onDateChange: Function;
-  minDate?: Dayjs | null;
+  minDate?: Dayjs | null; // Accept null but will handle it
+  required?: boolean;
 }) {
+  // Ensure minDate is either undefined or a valid Dayjs object
+  const validMinDate = minDate ?? undefined;
+
   return (
     <div className="w-fit space-y-4">
       <div className="text-md text-left text-gray-600">{label}</div>
@@ -23,7 +28,7 @@ export default function DatePickerComponent({
           className="bg-white"
           value={value}
           onChange={(newDate) => onDateChange(newDate)}
-          minDate={minDate}
+          minDate={validMinDate} // Pass valid value (undefined or Dayjs)
         />
       </LocalizationProvider>
     </div>

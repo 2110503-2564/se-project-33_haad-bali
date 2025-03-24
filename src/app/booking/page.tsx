@@ -3,12 +3,12 @@ import { TextField, Checkbox, FormControlLabel } from "@mui/material";
 import { Dayjs } from "dayjs";
 import dayjs from "dayjs"; // Import dayjs directly for date calculations
 import { useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, SetStateAction } from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { addBooking } from "@/redux/features/bookSlice";
 import { BookingItem, CampgroundItem } from "../../../interface"; // Import CampgroundItem type
-import { getSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 import getUserProfile from "@/libs/getUserProfile";
 import getCampgrounds from "@/libs/getCampgrounds"; // Import function to get campground data
 import { toast } from "react-toastify"; // Importing toastify for notifications
@@ -40,7 +40,7 @@ export default function Booking() {
   const [checkInError, setCheckInError] = useState<string>('');
   const [checkOutError, setCheckOutError] = useState<string>('');
   const [locationError, setLocationError] = useState<string>('');
-
+  const { data: session } = useSession();
   // Fetch campgrounds data
   useEffect(() => {
     const fetchCampgrounds = async () => {
@@ -66,7 +66,6 @@ export default function Booking() {
     const fetchUserProfile = async () => {
       const session = await getSession();
       const token = (session?.user as any)?.token;
-
       if (token) {
         const profile = await getUserProfile(token);
         setUser({
@@ -229,11 +228,12 @@ export default function Booking() {
     
     const items: BookingItem = {
       nameLastname: nameLastname,
+      _id: "unique-id-placeholder", // Ensure you generate an actual ID for your booking
       tel: tel,
-      campground: selectedCampground.name, // Use campground name from data
+      campground: selectedCampground, // Use the whole campground object, not just the name
       checkInDate: checkInDate!.format("YYYY-MM-DD"),
       checkOutDate: checkOutDate!.format("YYYY-MM-DD"),
-      breakfast: campgroundHasBreakfast ? breakfast : false, // Only include breakfast if available
+      breakfast: selectedCampground.breakfast && campgroundHasBreakfast ? breakfast : false, // Only include breakfast if available
     };
 
     // Dispatching the booking details
@@ -259,7 +259,7 @@ export default function Booking() {
       toast.error("An error occurred while making the booking.");
     }
   };
-
+  const token = ''
   return (
     <main className="w-[100%] flex flex-col items-center space-y-6 font-serif text-black">
       <div className="text-2xl font-serif mt-6 text-black">Campground Booking</div>
@@ -334,7 +334,7 @@ export default function Booking() {
         <DatePickerComponent
           label="Check-in Date"
           value={checkInDate}
-          onDateChange={(date) => {
+          onDateChange={(date: SetStateAction<Dayjs | null>) => {
             setCheckInDate(date);
             if (date) setCheckInError('');
           }}
@@ -400,11 +400,11 @@ export default function Booking() {
 
       <button
         className="block rounded-md bg-[#501717] hover:bg-[#731f1f] px-3 py-2 text-white shadow-sm"
-        name="Book Venue"
+        name="Book Campground"
         onClick={makeBooking}
         disabled={stayDuration > 3 || isLoading}
       >
-        Book Venue
+        Book Campground
       </button>
     </main>
   );

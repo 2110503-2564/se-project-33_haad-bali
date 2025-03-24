@@ -12,7 +12,7 @@ type BookState = {
 };
 
 const initialState: BookState = {
-  bookItems: [],
+  bookItems: [], // Initializing with an empty array to avoid undefined
   loading: false,
   error: null,
 };
@@ -42,9 +42,13 @@ export const bookSlice = createSlice({
   initialState,
   reducers: {
     addBooking: (state, action: PayloadAction<BookingItem>) => {
+      // Ensure bookItems is always an array before using findIndex
+      if (!state.bookItems) state.bookItems = [];
+      
       const existingIndex = state.bookItems.findIndex(
         (item) => item._id === action.payload._id
       );
+      
       if (existingIndex !== -1) {
         state.bookItems[existingIndex] = action.payload;
       } else {
@@ -53,6 +57,9 @@ export const bookSlice = createSlice({
     },
 
     removeBooking: (state, action: PayloadAction<BookingItem>) => {
+      // Ensure bookItems is always an array before filtering
+      if (!state.bookItems) state.bookItems = [];
+      
       state.bookItems = state.bookItems.filter(
         (item) => item._id !== action.payload._id
       );

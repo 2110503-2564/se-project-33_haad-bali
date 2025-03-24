@@ -7,7 +7,7 @@ import { AppDispatch } from "@/redux/store";
 export default function BookingList() {
     const bookItems = useAppSelector((state) => state.bookSlice.bookItems);
     const dispatch = useDispatch<AppDispatch>();
-    
+    console.log();
     return (
         <div className="w-full max-w-2xl mx-auto mt-8">
             <h2 className="text-2xl font-bold text-center mb-4 text-black">Your Campground Bookings</h2>
@@ -26,7 +26,7 @@ export default function BookingList() {
                                 <div>{booking.tel}</div>
                                 
                                 <div className="font-semibold">Campground:</div>
-                                <div>{booking.campground}</div>
+                                <div>{booking.campground.name}</div>
                                 
                                 {booking.checkInDate && (
                                     <>

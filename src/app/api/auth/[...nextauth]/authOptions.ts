@@ -33,21 +33,13 @@ export const authOptions:AuthOptions = {
           })
     ],
     session:{strategy:"jwt"},
-    callbacks: {
-      async jwt({ token, user }) {
-        if (user) {
-          token.name = user.name || user.email; // ใช้ email แทนถ้าไม่มี name
-          token.email = user.email;
-        }
-        return {...token,...user}
+    callbacks:{
+      async jwt({token,user}) {
+          return {...token,...user}
       },
-      async session({ session, token }) {
-        session.user = {
-          name: token.name,
-          email: token.email,
-      };  // ส่งข้อมูล token เข้า session
-        return session;
+      async session({session,token,user}) {
+          session.user = token
+          return session
       },
     }
-    
 }
