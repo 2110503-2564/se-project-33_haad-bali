@@ -10,6 +10,7 @@ import { addBooking } from "@/redux/features/bookSlice"
 import { BookingItem } from "../../../interface"
 import { getSession } from "next-auth/react"
 import getUserProfile from "@/libs/getUserProfile"
+import createBooking from "@/libs/createBooking"
 
 export default function Booking() {
     const urlParams = useSearchParams();
@@ -30,8 +31,9 @@ export default function Booking() {
     useEffect(() => {
         const fetchUserProfile = async () => {
             const session = await getSession();
+            console.log("Session:", session);
             const token = (session?.user as any)?.token; // ใช้ Type Assertion เพื่อหลีกเลี่ยง TS Error
-            
+            console.log("Session:", token);
             if (token) {
                 const profile = await getUserProfile(token);
                 setUser({
@@ -50,20 +52,34 @@ export default function Booking() {
         fetchUserProfile();
     }, []);
 
-    const makeBooking = () => {
-        if (bookLocation && bookDate && nameLastname && tel) {
-            const items: BookingItem = {
-                nameLastname: nameLastname,
-                tel: tel,  
-                campground: bookLocation, 
-                bookDate: bookDate.format("YYYY-MM-DD"), 
-            };
-            dispatch(addBooking(items));
-            console.log("Dispatching addBooking with item:", items); 
-        } else {
+    const makeBooking = async () => {
+        if (!bookLocation || !bookDate || !nameLastname || !tel) {
             console.log("Please fill in all fields.");
+            return;
         }
-    }
+    
+        const session = await getSession();
+        const token = (session?.user as any)?.token;
+        if (!token || !user) {
+            console.log("User not authenticated");
+            return;
+        }
+    
+        const bookingData = {
+            nameLastname: nameLastname,
+            tel: tel,
+            campground: bookLocation,
+            bookDate: bookDate.format("YYYY-MM-DD"),
+            userId: user.email,
+        };
+    
+        try {
+            const response = await createBooking(token, bookingData);
+            console.log("Booking successful:", response);
+        } catch (error) {
+            console.error("Booking failed:", error);
+        }
+    };
 
     return (
         <main className="w-[100%] flex flex-col items-center space-y-6 font-serif text-black">
@@ -132,10 +148,10 @@ export default function Booking() {
             <button 
                 className="block rounded-md bg-[#501717] hover:bg-[#731f1f] 
                 px-3 py-2 text-white shadow-sm" 
-                name="Book Venue"
+                name="Book Campground"
                 onClick={makeBooking}
             >
-                Book Venue
+                Book Campground
             </button>
         </main>
     );

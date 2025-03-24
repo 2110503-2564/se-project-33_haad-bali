@@ -20,8 +20,10 @@ export interface CamgroundItem {
   }
 
   export interface BookingItem {
+    checkInDate: string | number | Date;
     nameLastname: string;
+    _id: string,
     tel: string;
-    campground: string;
+    campground: CamgroundItem;
     bookDate: string;
   }
