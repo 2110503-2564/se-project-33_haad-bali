@@ -24,10 +24,10 @@ export default function Banner () {
             />
             <div className="absolute top-1/2 left-10 transform -translate-y-1/2 space-y-4">
                 <h1 className="text-5xl font-bold text-white drop-shadow-lg max-w-xl">
-                    Where every event finds its venue
+                Nature meets convenience
                 </h1>
                 <h3 className="text-xl text-white mt-2 drop-shadow-2xl max-w-xl">
-                    Book the perfect venue for your event—hassle-free and tailored to your needs!
+                discover and book the best campgrounds for your event!
                 </h3>
             </div>
             <button 
