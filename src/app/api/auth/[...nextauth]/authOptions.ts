@@ -46,4 +46,7 @@ export const authOptions: AuthOptions = {
       return baseUrl + "/home"; // Customize this redirect if necessary
     },
   },
+  pages: {
+    signIn: "/signin",
+  },
 };

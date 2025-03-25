@@ -17,13 +17,15 @@ export function TopMenu({ session }: TopMenuClientProps) {
     <div className={styles.menucontainer}>
       <div className={styles.leftSection}>
         {/* Logo Image */}
+        <Link href="/home" passHref>
         <Image
           src={'/img/logo.png'}
           className={styles.logoimg}
           alt="logo"
-          width={50} // Adjust width as needed
-          height={50} // Adjust height as needed
+          width={50}
+          height={50}
         />
+      </Link>
         {/* Wildstay text */}
         <span className="text-2xl font-extrabold text-white mt-1 ">WILDSTAY</span>
       </div>
@@ -66,7 +68,7 @@ export function TopMenu({ session }: TopMenuClientProps) {
                 // Logged-out state
                 <div className="py-1">
                   <Link 
-                    href="/api/auth/signin" 
+                    href="/signin" 
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     onClick={() => setIsDropdownOpen(false)}
                   >

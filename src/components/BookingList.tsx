@@ -18,7 +18,7 @@ interface User {
   name: string;
   telephone: string;
   email: string;
-  role: string;
+  role: 'user' | 'admin';
   createdAt: string;
 }
 
@@ -245,24 +245,38 @@ export default function BookingList() {
     useEffect(() => {
         fetchBookings();
     }, [session, status]);
-
-    const getUserDisplay = (user: User | string | undefined) => {
-        if (!user) return { name: "N/A", username: "N/A", telephone: "N/A" };
-        
+    const getUserDisplay = (user: User | string | undefined, currentUser: User | null) => {
+        // If no user data is available
+        if (!user) return { 
+            name: "N/A", 
+            username: "N/A", 
+            telephone: "N/A",
+            displayName: "N/A",
+            isCurrentUser: false
+        };
+    
+        // If `user` is a string (user ID), check if it matches the current user
         if (typeof user === 'string') {
+            const isCurrentUser = user === currentUser?._id;
             return {
-                name: currentUser?.name || "N/A",
-                username: currentUser?.username || "N/A",
-                telephone: currentUser?.telephone || "N/A"
+                name: isCurrentUser ? currentUser?.name || "User" : "Unknown User",
+                username: isCurrentUser ? currentUser?.username || "Unknown" : user, // Show the ID for unknown users
+                telephone: isCurrentUser ? currentUser?.telephone || "N/A" : "N/A",
+                displayName: isCurrentUser ? currentUser?.name || "User" : "Unknown",
+                isCurrentUser
             };
         }
-        
+    
+        // If `user` is an object, use its properties
         return {
             name: user.name,
             username: user.username,
-            telephone: user.telephone
+            telephone: user.telephone,
+            displayName: user.name,
+            isCurrentUser: user._id === currentUser?._id
         };
     };
+    
 
     if (isLoading) {
         return (
@@ -307,7 +321,7 @@ export default function BookingList() {
             ) : (
                 <div className="space-y-5">
                     {bookItems.map((booking, index) => {
-                        const userInfo = getUserDisplay(booking.user);
+                        const userInfo = getUserDisplay(booking.user, currentUser);
                         return (
                             <div key={index} className="bg-white overflow-hidden shadow rounded-lg transition-all duration-200 hover:shadow-md">
                                 <div className="px-6 py-5">
