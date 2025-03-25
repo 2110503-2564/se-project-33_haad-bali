@@ -1,6 +1,6 @@
 export default async function  getCampground(id:string) {
   
-  await new Promise((resolve) => setTimeout(resolve, 500));
+ // await new Promise((resolve) => setTimeout(resolve, 500));
 
   const response = await fetch(`http://campgrounds.us-east-1.elasticbeanstalk.com/api/v1/campgrounds/${id}`);
 
