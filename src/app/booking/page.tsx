@@ -17,7 +17,7 @@ import createBooking from "@/libs/createBooking";
 
 export default function Booking() {
   const urlParams = useSearchParams();
-  const vid = urlParams.get('id');
+  const cid = urlParams.get('id');
   const name = urlParams.get('name');
 
   const dispatch = useDispatch<AppDispatch>();

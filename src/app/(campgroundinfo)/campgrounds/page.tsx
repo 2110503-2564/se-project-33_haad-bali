@@ -2,7 +2,7 @@ import getCampgrounds from "@/libs/getCampgrounds"
 import CamgroundCatalog from "@/components/CampgroundCatalog"
 import { Suspense } from "react"
 import { LinearProgress } from "@mui/material"
-
+import { CampgroundsJson } from "../../../../interface"
 export default function Card() {
     const campgrounds = getCampgrounds()
 

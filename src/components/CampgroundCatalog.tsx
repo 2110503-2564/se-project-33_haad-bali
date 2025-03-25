@@ -1,87 +1,99 @@
-import getCampground from "@/libs/getCampground";
-import Image from "next/image";
-import Link from "next/link";
-import { FiMapPin, FiPhone, FiMail, FiHome, FiImage } from "react-icons/fi";
+'use client';
 
-export default async function CampgroundDetailPage({params}: {params: {cid: string}}) {
-    const campgroundDetail = await getCampground(params.cid);
-    
-    const getLocation = () => {
-        const parts = [
-            campgroundDetail.data.address,
-            campgroundDetail.data.district,
-            campgroundDetail.data.province,
-            campgroundDetail.data.postalcode
-        ].filter(Boolean);
-        
-        return parts.length > 0 ? parts.join(', ') : 'Location information not available';
+import { useState, useEffect } from 'react';
+import Card from "./Card";
+import Link from "next/link";
+import { CampgroundItem, CampgroundsJson } from "../../interface";
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi'; // React icons for carousel navigation
+
+export default function CampgroundCatalog({ campgroundsJson }: { campgroundsJson: Promise<CampgroundsJson> }) {
+    // States to store data and current index for carousel
+    const [campgroundJsonReady, setCampgroundJsonReady] = useState<CampgroundsJson | null>(null);
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    // Fetch the campground data
+    useEffect(() => {
+        const fetchData = async () => {
+            const data = await campgroundsJson; // Resolve the promise
+            setCampgroundJsonReady(data); // Store the data in state
+        };
+
+        fetchData();
+    }, [campgroundsJson]); // Dependency array to re-fetch if `campgroundsJson` changes
+
+    // Handle next and previous button click
+    const handleNext = () => {
+        if (campgroundJsonReady) {
+            const nextIndex = currentIndex + 1;
+            setCurrentIndex(nextIndex < Math.ceil(campgroundJsonReady.data.length / 4) ? nextIndex : 0);
+        }
     };
 
-    return (
-        <main className="text-center p-5 font-sans bg-gray-50 min-h-screen">
-            <h1 className="text-3xl font-semibold text-gray-800 mb-8">{campgroundDetail.data.name}</h1>
+    const handlePrev = () => {
+        if (campgroundJsonReady) {
+            const prevIndex = currentIndex - 1;
+            setCurrentIndex(prevIndex >= 0 ? prevIndex : Math.ceil(campgroundJsonReady.data.length / 4) - 1);
+        }
+    };
 
-            <div className="flex flex-col lg:flex-row items-center justify-center my-5 bg-white shadow-lg rounded-xl p-6 max-w-6xl mx-auto">
-                
-                {/* Image or Alternative */}
-                <div className="flex-1 w-full lg:w-1/2 mb-6 lg:mb-0 lg:mr-8 min-h-[300px] bg-gray-100 rounded-xl flex items-center justify-center">
-                    {campgroundDetail.data.picture ? (
-                        <Image 
-                            src={campgroundDetail.data.picture} 
-                            alt={`${campgroundDetail.data.name} Image`}
-                            width={600}
-                            height={400}
-                            className="rounded-xl w-full h-full object-cover shadow-md"
-                            priority
-                        />
-                    ) : (
-                        <div className="flex flex-col items-center text-gray-400">
-                            <FiImage className="text-5xl mb-3" />
-                            <p className="text-lg">No image available</p>
-                        </div>
-                    )}
-                </div>
-                
-                {/* Details */}
-                <div className="flex-1 w-full lg:w-1/2 text-gray-700">
-                    <div className="space-y-4">
-                        <div className="flex items-start">
-                            <FiMapPin className="mt-1 mr-2 text-indigo-600" />
-                            <div>
-                                <h2 className="font-medium text-gray-900">Location</h2>
-                                <p>{getLocation()}</p>
-                            </div>
-                        </div>
-                        
-                        {campgroundDetail.data.tel && (
-                            <div className="flex items-start">
-                                <FiPhone className="mt-1 mr-2 text-indigo-600" />
-                                <div>
-                                    <h2 className="font-medium text-gray-900">Contact</h2>
-                                    <p>{campgroundDetail.data.tel}</p>
-                                </div>
-                            </div>
-                        )}
-                        
-                        <div className="flex items-start">
-                            <FiHome className="mt-1 mr-2 text-indigo-600" />
-                            <div>
-                                <h2 className="font-medium text-gray-900">Facilities</h2>
-                                <p>Tents • Restrooms • Showers • Fire pits</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <Link 
-                        href={`/booking?id=${params.cid}&name=${encodeURIComponent(campgroundDetail.data.name)}`}
-                        className="block mt-8"
+    if (!campgroundJsonReady) {
+        return <div className="text-center text-lg text-gray-600">Loading...</div>; // Show a loading message until data is available
+    }
+
+    return (
+        <div className="relative max-w-full px-4 bg-gray-100 py-10">
+            <h2 className="text-2xl text-black font-semibold text-left mb-5">
+                Explore {campgroundJsonReady.count} campgrounds in our campground catalog
+            </h2>
+
+            <div className="relative">
+                <div className="flex overflow-hidden">
+                    <div
+                        className="flex transition-all duration-500"
+                        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
                     >
-                        <button className="w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition duration-300 transform hover:scale-[1.02] shadow-md">
-                            Book Your Stay
-                        </button>
-                    </Link>
+                        {/* Group cards into sets of 4 */}
+                        {Array.from({ length: Math.ceil(campgroundJsonReady.data.length / 4) }).map((_, setIndex) => (
+                            <div key={setIndex} className="flex w-full min-w-full justify-between">
+                                {campgroundJsonReady.data.slice(setIndex * 4, setIndex * 4 + 4).map((campgroundItem: CampgroundItem) => (
+                                    <Link
+                                        href={`/campgrounds/${campgroundItem.id}`}
+                                        className="w-1/4 px-2" // Each card takes up 1/4 of the container
+                                        key={campgroundItem.id}
+                                    >
+                                        <Card
+                                            campgroundName={campgroundItem.name}
+                                            imgSrc={campgroundItem.picture}
+                                        />
+                                    </Link>
+                                ))}
+                                {/* Add empty placeholders if needed to maintain 4 items per row */}
+                                {setIndex === Math.ceil(campgroundJsonReady.data.length / 4) - 1 && 
+                                 campgroundJsonReady.data.length % 4 !== 0 && 
+                                 Array.from({ length: 4 - (campgroundJsonReady.data.length % 4) }).map((_, i) => (
+                                    <div key={`empty-${i}`} className="w-1/4 px-2"></div>
+                                ))}
+                            </div>
+                        ))}
+                    </div>
                 </div>
+
+                {/* Carousel navigation buttons */}
+                <button
+                    onClick={handlePrev}
+                    className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black text-white p-3 rounded-full"
+                    aria-label="Previous"
+                >
+                    <FiChevronLeft size={24} />
+                </button>
+                <button
+                    onClick={handleNext}
+                    className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black text-white p-3 rounded-full"
+                    aria-label="Next"
+                >
+                    <FiChevronRight size={24} />
+                </button>
             </div>
-        </main>
+        </div>
     );
 }
