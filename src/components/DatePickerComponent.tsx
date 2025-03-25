@@ -37,7 +37,7 @@ export default function DatePickerComponent({
           value={value}
           onChange={handleDateChange}
           minDate={validMinDate}
-          renderInput={(params) => (
+          /*renderInput={(params) => (
             <TextField
               {...params}
               size="small"
@@ -63,8 +63,8 @@ export default function DatePickerComponent({
                 },
               }}
             />
-          )}
-          componentsProps={{
+          )}*/
+          /*componentsProps={{
             actionBar: {
               sx: {
                   backgroundColor: darkMode ? '#1F2937' : 'white',
@@ -86,7 +86,7 @@ export default function DatePickerComponent({
                 },
               },
             },
-          }}
+          }}*/
         />
       </LocalizationProvider>
     </div>

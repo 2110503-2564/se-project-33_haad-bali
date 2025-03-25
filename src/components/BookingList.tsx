@@ -11,6 +11,24 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { toast } from "react-toastify";
 import getUserProfile from "@/libs/getUserProfile";
+import { CampgroundItem } from "../../interface";
+import { duration } from "@mui/material";
+import { useRouter } from "next/navigation";
+
+
+const NavigateTwoPages = () => {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push('/home'); // First navigation
+    setTimeout(() => {
+      router.push('/mybooking'); // Navigate to second page after delay
+    }, 500); // 2-second delay
+  }, []);
+
+  return <p>Navigating...</p>;
+};
+
 
 interface User {
   _id: string;
@@ -24,33 +42,27 @@ interface User {
 
 interface BookingItem {
   _id: string;
-  user: User | string;
-  campground: {
-    _id: string;
-    name: string;
-    address: string;
-    tel: string;
-    price: number;
-    __v: number;
-  };
-  checkInDate: string;
-  checkOutDate: string;
+  user: string;
+  campground:  CampgroundItem;
+  apptDate: string | number | Date;
+  CheckInDate: string;
+  CheckOutDate: string;
   breakfast: boolean;
   tel: string;
-  createdAt: string;
 }
 
 export default function BookingList() {
     const { data: session, status } = useSession();
     const dispatch = useAppDispatch();
-    const bookItems = useAppSelector((state) => state.bookSlice.bookItems) as BookingItem[];
+    const bookItems = useAppSelector((state) => state.bookSlice.bookItems) ;
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>("");
     const [editingBooking, setEditingBooking] = useState<BookingItem | null>(null);
     const [editFormData, setEditFormData] = useState({
-        checkInDate: null as Date | null,
-        checkOutDate: null as Date | null,
-        breakfast: false
+        CheckInDate: null as Date | null,
+        CheckOutDate: null as Date | null,
+        breakfast: false,
+        duration: null as number | null
     });
     const [stayDuration, setStayDuration] = useState<number>(0);
     const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -74,12 +86,12 @@ export default function BookingList() {
         fetchUserData();
     }, []);
 
-    const handleDelete = async (bookingId: string) => {
+    const handleDelete = async (bookitem : BookingItem) => {
         if (status === "authenticated" && session?.user) {
             try {
                 const token = (session?.user as any)?.token;
-                await deleteBooking(token, bookingId);
-                dispatch(removeBooking({ _id: bookingId }));
+                await deleteBooking(token, bookitem._id);
+                dispatch(removeBooking(bookitem));
                 setError("");
                 toast.success("Booking deleted successfully");
             } catch (error) {
@@ -95,36 +107,42 @@ export default function BookingList() {
 
     const handleEditClick = (booking: BookingItem) => {
         setEditingBooking(booking);
-        const checkIn = booking.checkInDate ? new Date(booking.checkInDate) : new Date();
-        const checkOut = booking.checkOutDate ? new Date(booking.checkOutDate) : new Date(new Date().setDate(checkIn.getDate() + 1));
+        const checkIn = booking.CheckInDate ? new Date(booking.CheckInDate) : new Date();
+        const checkOut = booking.CheckOutDate ? new Date(booking.CheckOutDate) : new Date(new Date().setDate(checkIn.getDate() + 1));
+        const timeDiff = checkOut.getTime() - checkIn.getTime();
+        const duration = Math.ceil(timeDiff / (1000 * 60 * 60 * 24))
         
         setEditFormData({
-            checkInDate: checkIn,
-            checkOutDate: checkOut,
-            breakfast: booking.breakfast || false
+            CheckInDate: checkIn,
+            CheckOutDate: checkOut,
+            breakfast: booking.breakfast || false,
+            duration: duration
         });
 
         if (checkIn && checkOut) {
             const timeDiff = checkOut.getTime() - checkIn.getTime();
             setStayDuration(Math.ceil(timeDiff / (1000 * 60 * 60 * 24)));
+            console.log("stay duration",stayDuration)
         }
     };
 
     const handleCheckInChange = (date: Date | null) => {
         if (date) {
             setEditFormData(prev => {
-                const newState = {...prev, checkInDate: date};
+                const newState = {...prev, CheckInDate: date};
                 
-                if (newState.checkOutDate && date > newState.checkOutDate) {
+                if (newState.CheckOutDate && date > newState.CheckOutDate) {
                     const newCheckOut = new Date(date);
                     newCheckOut.setDate(newCheckOut.getDate() + 1);
-                    newState.checkOutDate = newCheckOut;
+                    newState.CheckOutDate = newCheckOut;
                     toast.info("Check-out date adjusted to next day");
+                    console.log("1")
                 }
                 
-                if (newState.checkOutDate) {
-                    const timeDiff = newState.checkOutDate.getTime() - date.getTime();
+                if (newState.CheckOutDate) {
+                    const timeDiff = newState.CheckOutDate.getTime() - date.getTime();
                     setStayDuration(Math.ceil(timeDiff / (1000 * 60 * 60 * 24)));
+                    console.log("2")
                 }
                 
                 return newState;
@@ -133,31 +151,32 @@ export default function BookingList() {
         }
     };
 
-    const handleCheckoutDateChange = (date: Date | null) => {
-        if (date && editFormData.checkInDate) {
-            const start = new Date(editFormData.checkInDate);
+    const handleCheckOutDateChange = (date: Date | null) => {
+        if (date && editFormData.CheckInDate) {
+            const start = new Date(editFormData.CheckInDate);
             const end = new Date(date);
             start.setHours(0, 0, 0, 0);
             end.setHours(0, 0, 0, 0);
             
             const timeDiff = end.getTime() - start.getTime();
             const nights = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+            console.log("nightsssss : ",nights)
             
             if (nights > 3) {
-                const correctedCheckoutDate = new Date(start);
-                correctedCheckoutDate.setDate(correctedCheckoutDate.getDate() + 3);
-                setEditFormData({...editFormData, checkOutDate: correctedCheckoutDate});
+                const correctedCheckOutDate = new Date(start);
+                correctedCheckOutDate.setDate(correctedCheckOutDate.getDate() + 3);
+                setEditFormData({...editFormData, CheckOutDate: correctedCheckOutDate});
                 setStayDuration(3);
                 
                 toast.warning(
                     <div>
                         <p className="font-medium">Maximum stay duration is 3 nights</p>
-                        <p className="text-sm">Check-out date adjusted to {correctedCheckoutDate.toLocaleDateString()}</p>
+                        <p className="text-sm">Check-out date adjusted to {correctedCheckOutDate.toLocaleDateString()}</p>
                     </div>,
                     { autoClose: 5000 }
                 );
             } else {
-                setEditFormData({...editFormData, checkOutDate: date});
+                setEditFormData({...editFormData, CheckOutDate: date});
                 setStayDuration(nights);
                 setError("");
                 
@@ -166,51 +185,84 @@ export default function BookingList() {
                 }
             }
         } else {
-            setEditFormData({...editFormData, checkOutDate: date});
+            setEditFormData({...editFormData, CheckOutDate: date});
             setStayDuration(0);
         }
     };
-
+    const router = useRouter();
     const handleUpdate = async () => {
-        if (!editingBooking || !editFormData.checkInDate || !editFormData.checkOutDate || status !== "authenticated" || !session?.user) {
+        if (!editingBooking || !editFormData.CheckInDate || !editFormData.CheckOutDate || status !== "authenticated" || !session?.user) {
             setError("Please select valid check-in and check-out dates");
             toast.error("Please fill all required fields");
             return;
         }
-
-        if (editFormData.checkOutDate <= editFormData.checkInDate) {
+    
+        if (editFormData.CheckOutDate <= editFormData.CheckInDate) {
             setError("Check-out date must be after check-in date");
             toast.error("Invalid date range");
             return;
         }
-
+    
         try {
             const token = (session?.user as any)?.token;
             const updatedData = {
                 ...editingBooking,
-                checkInDate: editFormData.checkInDate.toISOString().split('T')[0],
-                checkOutDate: editFormData.checkOutDate.toISOString().split('T')[0],
-                breakfast: editFormData.breakfast
-            };
+                duration:editFormData.duration,
+                CheckInDate: editFormData.CheckInDate.toISOString().split('T')[0],
+                CheckOutDate: editFormData.CheckOutDate.toISOString().split('T')[0],
+                breakfast: editFormData.breakfast,
 
+            };
+    
+            // Show loading state
+            toast.loading('Saving your changes...', {
+     
+                style: {
+                    background: '#f0f9ff',
+                    color: '#0369a1',
+                }
+            });
+    
             const response = await updateBooking(token, editingBooking._id, updatedData);
             
             if (response.success) {
-                dispatch(removeBooking({ _id: editingBooking._id }));
-                dispatch(addBooking(response.data));
-                setError("");
-                setEditingBooking(null);
-                toast.success("Booking updated successfully!");
+                // Show success message
+                toast.success('Changes saved!', {
+               
+                    style: {
+                        background: '#f0fdf4',
+                        color: '#15803d',
+                    }
+                });
+    
+                // Wait 200ms before refreshing data
+                setTimeout(async () => {
+                    await fetchBookings(); // Refresh the bookings list
+                    setEditingBooking(null); // Close the edit modal
+                }, 200);
+                
             } else {
                 setError(response.message || "Failed to update booking");
-                toast.error(response.message || "Failed to update booking");
+                toast.error(response.message || "Failed to update booking", {
+  
+                    style: {
+                        background: '#fef2f2',
+                        color: '#b91c1c',
+                    }
+                });
             }
         } catch (error) {
             console.error("Update failed:", error);
             setError("Failed to update booking");
-            toast.error("Failed to update booking");
+            toast.error("Failed to update booking", {
+                style: {
+                    background: '#fef2f2',
+                    color: '#b91c1c',
+                }
+            });
         }
     };
+
 
     const fetchBookings = async () => {
         if (status === "authenticated" && session?.user) {
@@ -223,7 +275,7 @@ export default function BookingList() {
                     
                     if (Array.isArray(bookingsResponse.data)) {
                         dispatch(resetBookings());
-                        bookingsResponse.data.forEach((booking: BookingItem) => dispatch(addBooking(booking)));
+                        bookingsResponse.data.forEach((booking:BookingItem ) => dispatch(addBooking(booking)));
                     } else {
                         setError("Bookings data is not an array.");
                     }
@@ -356,21 +408,33 @@ export default function BookingList() {
                                                 <p className="text-sm text-gray-900">{booking.campground?.tel}</p>
                                             </div>
                                         </div>
-                                        {booking.checkInDate && (
+                                        {booking.CheckInDate && (
                                             <div className="flex items-center">
                                                 <FiCalendar className="flex-shrink-0 h-5 w-5 text-gray-400" />
                                                 <div className="ml-3">
                                                     <p className="text-sm font-medium text-gray-500">Check-in Date</p>
-                                                    <p className="text-sm text-gray-900">{booking.checkInDate}</p>
+                                                    <p className="text-sm text-gray-900">
+    {new Date(booking.CheckInDate).toLocaleDateString('en-UK', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })}
+  </p>
                                                 </div>
                                             </div>
                                         )}
-                                        {booking.checkOutDate && (
+                                        {booking.CheckOutDate && (
                                             <div className="flex items-center">
                                                 <FiCalendar className="flex-shrink-0 h-5 w-5 text-gray-400" />
                                                 <div className="ml-3">
                                                     <p className="text-sm font-medium text-gray-500">Check-out Date</p>
-                                                    <p className="text-sm text-gray-900">{booking.checkOutDate}</p>
+                                                    <p className="text-sm text-gray-900">
+    {new Date(booking.CheckOutDate).toLocaleDateString('en-UK', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })}
+  </p>
                                                 </div>
                                             </div>
                                         )}
@@ -387,7 +451,7 @@ export default function BookingList() {
                                 </div>
                                 <div className="bg-gray-50 px-6 py-3 flex justify-end">
                                     <button
-                                        onClick={() => handleDelete(booking._id)}
+                                        onClick={() => handleDelete(booking)}
                                         className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200"
                                     >
                                         Cancel Booking
@@ -431,7 +495,7 @@ export default function BookingList() {
                                     Check-in Date
                                 </label>
                                 <DatePicker
-                                    selected={editFormData.checkInDate}
+                                    selected={editFormData.CheckInDate}
                                     onChange={handleCheckInChange}
                                     minDate={new Date()}
                                     className="w-full p-3 border border-gray-300 rounded-md text-gray-900"
@@ -445,10 +509,10 @@ export default function BookingList() {
                                     Check-out Date
                                 </label>
                                 <DatePicker
-                                    selected={editFormData.checkOutDate}
-                                    onChange={handleCheckoutDateChange}
-                                    minDate={editFormData.checkInDate ? 
-                                        new Date(new Date(editFormData.checkInDate).setDate(editFormData.checkInDate.getDate() + 1)) : 
+                                    selected={editFormData.CheckOutDate}
+                                    onChange={handleCheckOutDateChange}
+                                    minDate={editFormData.CheckInDate ? 
+                                        new Date(new Date(editFormData.CheckInDate).setDate(editFormData.CheckInDate.getDate() + 1)) : 
                                         new Date(new Date().setDate(new Date().getDate() + 1))}
                                     className="w-full p-3 border border-gray-300 rounded-md text-gray-900"
                                     dateFormat="yyyy-MM-dd"

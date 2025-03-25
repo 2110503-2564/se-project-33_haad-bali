@@ -193,8 +193,8 @@ export default function Booking() {
 
     const bookingItem: BookingItem = {
       _id: "",
-      checkInDate: checkInDateISO,
-      checkOutDate: checkOutDateISO,
+      CheckInDate: checkInDateISO,
+      CheckOutDate: checkOutDateISO,
       tel: tel,
       campground: selectedCampground,
       breakfast: campgroundHasBreakfast ? breakfast : false,

@@ -38,7 +38,7 @@ export default function DateReserve({
               onDateChange(value);
             }
           }}
-          minDate={minDate}
+          minDate={minDate??undefined}
         />
       </LocalizationProvider>
 

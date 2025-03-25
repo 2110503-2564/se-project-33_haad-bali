@@ -1,4 +1,5 @@
 export async function updateBooking(token: string, bookingId: string, bookingData: any) {
+    console.log("booking data",bookingData)
     const response = await fetch(`${process.env.BACKEND_URL}/api/v1/bookings/${bookingId}`, {
         method: 'PUT',
         headers: {

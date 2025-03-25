@@ -18,16 +18,20 @@ export interface CampgroundsJson {
   pagination: Object;
   data: CampgroundItem[];
 }
-
+export interface BookingsJson {
+  success: boolean;
+  count: number;
+  pagination: Object;
+  data: BookingItem[];
+}
 export interface BookingItem {
   _id: string,
-  checkInDate: string;   // Added check-in date
-  checkOutDate: string;  // Added check-out date
+  CheckInDate: string;   // Added check-in date
+  CheckOutDate: string;  // Added check-out date
   breakfast: boolean;    // Added breakfast option
   campground: CampgroundItem;
   apptDate: string | number | Date;
   user:string;
-
   tel: string;
   
   

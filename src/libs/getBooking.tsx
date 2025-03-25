@@ -1,5 +1,5 @@
-import { CampgroundsJson } from "../../interface";
-export default async function getBookings(token: string): Promise<CampgroundsJson> {
+import { BookingsJson } from "../../interface";
+export default async function getBookings(token: string): Promise<BookingsJson> {
     const response = await fetch(
       `${process.env.BACKEND_URL}/api/v1/bookings`, // เอา ?limit ออก
       {
