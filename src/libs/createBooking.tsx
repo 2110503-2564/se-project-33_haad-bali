@@ -1,6 +1,6 @@
 export default async function createBooking(
     token: string,
-    bookingData: { nameLastname: string; tel: string; campground: string; bookDate: string; userId: string }
+    bookingData: { nameLastname: string; tel: string; campground: string; CheckInDate: string;CheckOutDate:string; userId: string ;breakfast:boolean;}
 ) {
     const response = await fetch(`${process.env.BACKEND_URL}/api/v1/bookings/${bookingData.campground}`, {
         method: 'POST',
