@@ -339,7 +339,7 @@ export default function BookingList() {
                                             <FiPhone className="flex-shrink-0 h-5 w-5 text-gray-400" />
                                             <div className="ml-3">
                                                 <p className="text-sm font-medium text-gray-500">Phone</p>
-                                                <p className="text-sm text-gray-900">{userInfo.telephone}</p>
+                                                <p className="text-sm text-gray-900">{booking.campground?.tel}</p>
                                             </div>
                                         </div>
                                         {booking.checkInDate && (

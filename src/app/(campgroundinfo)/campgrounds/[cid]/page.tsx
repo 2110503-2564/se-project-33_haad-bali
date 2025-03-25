@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FiMapPin, FiPhone, FiMail, FiHome } from "react-icons/fi";
 
-export default async function CampgroundDetailPage({params} : {params: {cid:string}}) {
+export default async function CampgroundDetailPage({ params }: { params: { cid: string } }) {
     const campgroundDetail = await getCampground(params.cid);
     
     // Construct location string from available data
@@ -19,10 +19,10 @@ export default async function CampgroundDetailPage({params} : {params: {cid:stri
     };
 
     return (
-        <main className="text-center p-5 font-sans bg-gray-50 min-h-screen">
-            <h1 className="text-3xl font-semibold text-gray-800 mb-8">{campgroundDetail.data.name}</h1>
+        <main className="text-left p-5 font-sans bg-gray-50 min-h-screen">
+            <h1 className="text-4xl font-semibold text-gray-800 mb-4 ml-10">{campgroundDetail.data.name}</h1>
 
-            <div className="flex flex-col lg:flex-row items-center justify-center my-5 bg-white shadow-lg rounded-xl p-6 max-w-6xl mx-auto">
+            <div className="flex flex-col lg:flex-row items-center justify-between my-5 bg-white shadow-lg rounded-xl p-6 max-w-6xl mx-auto">
                 
                 {/* Campground Image */}
                 <div className="flex-1 w-full lg:w-1/2 mb-6 lg:mb-0 lg:mr-8">
@@ -40,31 +40,31 @@ export default async function CampgroundDetailPage({params} : {params: {cid:stri
                 <div className="flex-1 w-full lg:w-1/2 text-gray-700">
                     <div className="space-y-4">
                         {/* Location with icon */}
-                        <div className="flex items-start">
-                            <FiMapPin className="mt-1 mr-2 text-indigo-600" />
+                        <div className="flex items-start space-x-2">
+                            <FiMapPin className="mt-1 text-indigo-600" />
                             <div>
-                                <h2 className="font-medium text-gray-900">Location</h2>
-                                <p>{getLocation()}</p>
+                                <h2 className="font-medium text-gray-900 text-lg">Location</h2>
+                                <p className="text-gray-600">{getLocation()}</p>
                             </div>
                         </div>
                         
                         {/* Contact with icon */}
                         {campgroundDetail.data.tel && (
-                            <div className="flex items-start">
-                                <FiPhone className="mt-1 mr-2 text-indigo-600" />
+                            <div className="flex items-start space-x-2">
+                                <FiPhone className="mt-1 text-indigo-600" />
                                 <div>
-                                    <h2 className="font-medium text-gray-900">Contact</h2>
-                                    <p>{campgroundDetail.data.tel}</p>
+                                    <h2 className="font-medium text-gray-900 text-lg">Contact</h2>
+                                    <p className="text-gray-600">{campgroundDetail.data.tel}</p>
                                 </div>
                             </div>
                         )}
                         
-                        {/* Additional details can be added here */}
-                        <div className="flex items-start">
-                            <FiHome className="mt-1 mr-2 text-indigo-600" />
+                        {/* Facilities with icon */}
+                        <div className="flex items-start space-x-2">
+                            <FiHome className="mt-1 text-indigo-600" />
                             <div>
-                                <h2 className="font-medium text-gray-900">Facilities</h2>
-                                <p>Tents, Restrooms, Showers, Fire pits</p>
+                                <h2 className="font-medium text-gray-900 text-lg">Facilities</h2>
+                                <p className="text-gray-600">Tents, Restrooms, Showers, Fire pits</p>
                             </div>
                         </div>
                     </div>
