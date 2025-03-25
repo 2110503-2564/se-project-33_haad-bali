@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 
 export default async function getUserProfile(token: string) {
   // Endpoint for user profile
-  const url = "http://localhost:5000/api/v1/auth/me";
+  const url = "http://campgrounds.us-east-1.elasticbeanstalk.com/api/v1/auth/me";
 
   try {
     const response = await fetch(url, {

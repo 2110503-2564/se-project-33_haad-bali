@@ -10,7 +10,7 @@ export const addUser = async (userData: {
 }) => {
   try {
     const response = await axios.post(
-      "http://localhost:5000/api/v1/auth/register", // Backend API for registration
+      "http://campgrounds.us-east-1.elasticbeanstalk.com/api/v1/auth/register", // Backend API for registration
       userData
     );
     return response.data; // Returns success or failure message
