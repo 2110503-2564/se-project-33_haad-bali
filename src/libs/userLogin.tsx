@@ -3,7 +3,7 @@ import {CampgroundsJson  } from "../../interface";
 import { headers } from "next/headers";
 
 export default async function userLogin(userEmail:string,userPassword:string){
-    const response = await fetch("http://campgrounds.us-east-1.elasticbeanstalk.com/api/v1/auth/login",{
+    const response = await fetch(`${process.env.BACKEND_URL}/api/v1/auth/login`,{
     method:"POST",
     headers:{
         "Content-Type":"application/json",
