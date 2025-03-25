@@ -30,13 +30,8 @@ export default function Banner () {
                     Book the perfect venue for your event—hassle-free and tailored to your needs!
                 </h3>
             </div>
-            {session && (
-                <div className="z-30 absolute top-5 left-5 font-semibold text-cyan-200 text-xl">
-                    Welcome {session.user?.name}
-                </div>
-            )}
             <button 
-                className="z-30 absolute bottom-5 left-10 bg-black text-white font-semibold py-3 px-6 rounded-3xl transition-all duration-300 transform hover:bg-white hover:text-black hover:border-transparent hover:scale-105"
+                className="z-20 absolute bottom-5 left-10 bg-black text-white font-semibold py-3 px-6 rounded-3xl transition-all duration-300 transform hover:bg-white hover:text-black hover:border-transparent hover:scale-105"
                 onClick={(e) => { 
                     e.stopPropagation(); 
                     router.push('/campgrounds');
