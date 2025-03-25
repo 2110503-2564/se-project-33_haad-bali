@@ -77,7 +77,7 @@ export default function Booking() {
     };
     
     fetchData();
-  }, []);
+  }, []);  
 
   // Calculate stay duration
   useEffect(() => {
@@ -109,6 +109,7 @@ export default function Booking() {
       setCampgroundHasBreakfast(false);
     }
   };
+
   const handleCheckoutDateChange = (date: Dayjs | null) => {
     if (date && checkInDate) {
       const start = checkInDate.startOf('day');
@@ -135,6 +136,7 @@ export default function Booking() {
     console.log("Check-in Date (ISO):", checkInDateISO);
     console.log("Check-out Date (ISO):", checkOutDateISO);
   };
+
   const validateForm = (): boolean => {
     let isValid = true;
     
@@ -229,36 +231,36 @@ export default function Booking() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-white">Book Your Stay</h1>
-          <p className="mt-2 text-lg text-gray-300">
+          <h1 className="text-3xl font-bold text-black">Book Your Stay</h1>
+          <p className="mt-2 text-lg text-gray-600">
             {name ? `Reserving at ${name}` : "Select your perfect campground"}
           </p>
         </div>
 
-        <div className="bg-gray-800 shadow-xl rounded-2xl overflow-hidden">
+        <div className="bg-gray-50 shadow-xl rounded-2xl overflow-hidden">
           {/* User Info Section */}
-          <div className="p-6 border-b border-gray-700">
-            <h2 className="text-xl font-semibold text-white mb-4">Your Information</h2>
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-black mb-4">Your Information</h2>
             {user && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-400">Username</p>
-                  <p className="font-medium text-white">{user.name}</p>
+                  <p className="text-sm text-gray-500">Username</p>
+                  <p className="font-medium text-black">{user.name}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-400">Email</p>
-                  <p className="font-medium text-white">{user.email}</p>
+                  <p className="text-sm text-gray-500">Email</p>
+                  <p className="font-medium text-black">{user.email}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-400">Phone</p>
-                  <p className="font-medium text-white">{user.tel || 'Not provided'}</p>
+                  <p className="text-sm text-gray-500">Phone</p>
+                  <p className="font-medium text-black">{user.tel || 'Not provided'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-400">Member Since</p>
-                  <p className="font-medium text-white">
+                  <p className="text-sm text-gray-500">Member Since</p>
+                  <p className="font-medium text-black">
                     {new Date(user.createdAt).toLocaleDateString()}
                   </p>
                 </div>
@@ -268,7 +270,7 @@ export default function Booking() {
 
           {/* Booking Form Section */}
           <div className="p-6">
-            <h2 className="text-xl font-semibold text-white mb-6">Booking Details</h2>
+            <h2 className="text-xl font-semibold text-black mb-6">Booking Details</h2>
             
             <div className="space-y-6">
               {/* Name Field */}
@@ -285,16 +287,16 @@ export default function Booking() {
                   error={!!nameError}
                   helperText={nameError}
                   required
-                  InputLabelProps={{ className: "text-gray-400" }}
-                  InputProps={{ className: "text-white" }}
+                  InputLabelProps={{ className: "text-gray-600" }}
+                  InputProps={{ className: "text-black" }}
                   sx={{
                     "& .MuiOutlinedInput-root": {
-                      "& fieldset": { borderColor: "#4B5563" },
-                      "&:hover fieldset": { borderColor: "#9CA3AF" },
-                      "&.Mui-focused fieldset": { borderColor: "#6366F1" }
+                      "& fieldset": { borderColor: "#d1d5db" },
+                      "&:hover fieldset": { borderColor: "#9ca3af" },
+                      "&.Mui-focused fieldset": { borderColor: "#6366f1" }
                     },
-                    "& .MuiInputLabel-root": { color: "#9CA3AF" },
-                    "& .MuiInputBase-input": { color: "white" }
+                    "& .MuiInputLabel-root": { color: "#6b7280" },
+                    "& .MuiInputBase-input": { color: "black" }
                   }}
                 />
               </div>
@@ -313,21 +315,21 @@ export default function Booking() {
                   error={!!telError}
                   helperText={telError}
                   required
-                  InputLabelProps={{ className: "text-gray-400" }}
-                  InputProps={{ className: "text-white" }}
+                  InputLabelProps={{ className: "text-gray-600" }}
+                  InputProps={{ className: "text-black" }}
                   sx={{
                     "& .MuiOutlinedInput-root": {
-                      "& fieldset": { borderColor: "#4B5563" },
-                      "&:hover fieldset": { borderColor: "#9CA3AF" },
-                      "&.Mui-focused fieldset": { borderColor: "#6366F1" }
+                      "& fieldset": { borderColor: "#d1d5db" },
+                      "&:hover fieldset": { borderColor: "#9ca3af" },
+                      "&.Mui-focused fieldset": { borderColor: "#6366f1" }
                     },
-                    "& .MuiInputLabel-root": { color: "#9CA3AF" },
-                    "& .MuiInputBase-input": { color: "white" }
+                    "& .MuiInputLabel-root": { color: "#6b7280" },
+                    "& .MuiInputBase-input": { color: "black" }
                   }}
                 />
               </div>
 
-              {/* Date Pickers - You'll need to customize your DatePickerComponent for dark mode */}
+              {/* Date Pickers - You'll need to customize your DatePickerComponent for light mode */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <DatePickerComponent
@@ -338,7 +340,7 @@ export default function Booking() {
                       if (date) setCheckInError('');
                     }}
                     minDate={dayjs()}
-                    darkMode
+                    darkMode={false}
                   />
                   {checkInError && <p className="text-red-400 text-sm mt-1">{checkInError}</p>}
                 </div>
@@ -348,7 +350,7 @@ export default function Booking() {
                     value={checkOutDate}
                     onDateChange={handleCheckoutDateChange}
                     minDate={checkInDate}
-                    darkMode
+                    darkMode={false}
                   />
                   {checkOutError && <p className="text-red-400 text-sm mt-1">{checkOutError}</p>}
                 </div>
@@ -356,10 +358,10 @@ export default function Booking() {
 
               {/* Duration Info */}
               {stayDuration > 0 && (
-                <div className={`p-3 rounded-lg ${stayDuration === 3 ? 'bg-amber-900/30' : 'bg-blue-900/30'}`}>
-                  <p className="text-sm font-medium text-white">
+                <div className={`p-3 rounded-lg ${stayDuration === 3 ? 'bg-yellow-200' : 'bg-blue-200'}`}>
+                  <p className="text-sm font-medium text-black">
                     Stay Duration: <span className="font-semibold">{stayDuration} night{stayDuration !== 1 ? 's' : ''}</span>
-                    {stayDuration === 3 && <span className="text-amber-300 ml-2">(Maximum stay)</span>}
+                    {stayDuration === 3 && <span className="text-yellow-500 ml-2">(Maximum stay)</span>}
                   </p>
                 </div>
               )}
@@ -369,7 +371,7 @@ export default function Booking() {
                 <FormControl fullWidth error={!!locationError}>
                   <InputLabel 
                     id="campground-select-label"
-                    className="text-gray-400"
+                    className="text-gray-600"
                   >
                     Campground
                   </InputLabel>
@@ -379,30 +381,25 @@ export default function Booking() {
                     value={bookLocation}
                     onChange={(e) => handleLocationChange(e.target.value as string)}
                     required
-                    className="text-white"
+                    className="text-black"
                     sx={{
                       "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#4B5563"
+                        borderColor: "#d1d5db"
                       },
                       "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#9CA3AF"
+                        borderColor: "#9ca3af"
                       },
                       "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#6366F1"
-                      },
-                      "& .MuiSvgIcon-root": {
-                        color: "#9CA3AF"
+                        borderColor: "#333"
                       }
                     }}
                   >
-                    <MenuItem value="" className="text-gray-400"><em>Select a campground</em></MenuItem>
-                    {campgrounds.map((camp) => (
-                      <MenuItem 
-                        key={camp.id} 
-                        value={camp.id}
-                        className="text-white hover:bg-gray-700"
-                      >
-                        {camp.name}
+                    <MenuItem value="">
+                      <em>None</em>
+                    </MenuItem>
+                    {campgrounds.map((campground) => (
+                      <MenuItem key={campground.id} value={campground.id}>
+                        {campground.name}
                       </MenuItem>
                     ))}
                   </Select>
@@ -412,75 +409,33 @@ export default function Booking() {
 
               {/* Breakfast Option */}
               {campgroundHasBreakfast && (
-                <div className="pt-2">
+                <div>
                   <FormControlLabel
                     control={
-                      <Checkbox 
-                        checked={breakfast} 
-                        onChange={() => setBreakfast(!breakfast)}
-                        color="primary"
+                      <Checkbox
+                        checked={breakfast}
+                        onChange={(e) => setBreakfast(e.target.checked)}
                         sx={{
-                          color: "#9CA3AF",
-                          "&.Mui-checked": {
-                            color: "#6366F1"
-                          }
+                          color: '#6366f1',
+                          '&.Mui-checked': { color: '#6366f1' }
                         }}
                       />
                     }
-                    label={<span className="text-gray-300">Include Breakfast (+$15/night)</span>}
+                    label="Add Breakfast"
+                    sx={{ color: 'black' }}
                   />
                 </div>
               )}
 
-              {/* Submit Button */}
-              <div className="pt-4">
+              {/* Book Button */}
+              <div className="text-center">
                 <button
-                  className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-lg shadow-md transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={makeBooking}
-                  disabled={stayDuration > 3 || isLoading}
+                  disabled={isLoading}
+                  className="w-full bg-black text-white p-3 rounded-md disabled:opacity-50 active:bg-gray-800 focus:bg-black focus:outline-none"
                 >
-                  {isLoading ? (
-                    <span className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Processing...
-                    </span>
-                  ) : 'Confirm Booking'}
+                  {isLoading ? 'Processing...' : 'Book Now'}
                 </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Summary Card */}
-        <div className="hidden lg:block lg:absolute lg:top-32 lg:right-8 lg:w-80">
-          <div className="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-            <h3 className="font-bold text-lg text-white mb-4">Booking Summary</h3>
-            <div className="space-y-3 text-gray-300">
-              <div className="flex justify-between">
-                <span>Nights:</span>
-                <span className="text-white">{stayDuration || '--'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Location:</span>
-                <span className="text-right text-white">
-                  {campgrounds.find(c => c.id === bookLocation)?.name || 'Not selected'}
-                </span>
-              </div>
-              {breakfast && (
-                <div className="flex justify-between">
-                  <span>Breakfast:</span>
-                  <span className="text-green-400">Included</span>
-                </div>
-              )}
-              <div className="border-t border-gray-700 my-2"></div>
-              <div className="flex justify-between font-semibold text-white">
-                <span>Estimated Total:</span>
-                <span>
-                  ${stayDuration ? (stayDuration * 50 + (breakfast ? stayDuration * 15 : 0)) : '--'}
-                </span>
               </div>
             </div>
           </div>
