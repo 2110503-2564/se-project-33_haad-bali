@@ -1,4 +1,3 @@
-// pages/register.tsx
 "use client";
 import { useState } from "react";
 import { addUser } from "@/libs/addUser"; // Import the addUser function
@@ -64,7 +63,7 @@ export default function Register() {
               value={formData.username}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md text-black"
             />
           </div>
           <div className="mb-4">
@@ -75,7 +74,7 @@ export default function Register() {
               value={formData.name}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md text-black"
             />
           </div>
           <div className="mb-4">
@@ -86,7 +85,7 @@ export default function Register() {
               value={formData.telephone}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md text-black"
             />
           </div>
           <div className="mb-4">
@@ -97,7 +96,7 @@ export default function Register() {
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md text-black"
             />
           </div>
           <div className="mb-4">
@@ -108,7 +107,7 @@ export default function Register() {
               value={formData.password}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md text-black"
             />
           </div>
           <button

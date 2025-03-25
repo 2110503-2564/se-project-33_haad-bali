@@ -2,7 +2,7 @@ export default async function createBooking(
     token: string,
     bookingData: { nameLastname: string; tel: string; campground: string; bookDate: string; userId: string }
 ) {
-    const response = await fetch(`http://localhost:5000/api/v1/bookings/${bookingData.campground}`, {
+    const response = await fetch(`http://campgrounds.us-east-1.elasticbeanstalk.com/api/v1/bookings/${bookingData.campground}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
