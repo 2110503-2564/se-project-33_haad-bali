@@ -24,22 +24,16 @@ export const authOptions: AuthOptions = {
       },
     }),
   ],
+  
   session: { strategy: "jwt" },
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.name = user.name || user.email;
-        token.email = user.email;
-      }
-      return { ...token, ...user };
-    },
-    async session({ session, token }) {
-      session.user = {
-        name: token.name,
-        email: token.email,
-      };
-      return session;
-    },
+    async jwt({token,user}) {
+      return {...token,...user}
+  },
+  async session({session,token,user}) {
+      session.user = token
+      return session
+  },
     async signIn({ user }) {
       if (user) {
         // Redirect to home after successful sign-in

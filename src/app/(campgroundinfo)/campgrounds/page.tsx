@@ -10,7 +10,7 @@ export default function Card() {
         <main className="text-center p-5">
         
             <Suspense fallback={ <p>Loading... <LinearProgress/></p> }>
-            <CamgroundCatalog cammpgroundsJson={campgrounds}/>                
+            <CamgroundCatalog campgroundsJson={campgrounds}/>                
             </Suspense>
         </main>
     )

@@ -1,48 +1,85 @@
 import getCampground from "@/libs/getCampground";
 import Image from "next/image";
 import Link from "next/link";
+import { FiMapPin, FiPhone, FiMail, FiHome } from "react-icons/fi";
 
 export default async function CampgroundDetailPage({params} : {params: {cid:string}}) {
-    
     const campgroundDetail = await getCampground(params.cid);
-    // /**
-    //  *  Mock Data for Demonstation Only
-    //  */
-    // const mockVenueRepo = new Map()
-    // mockVenueRepo.set("001", {name:"The Bloom Pavilion", image:"/img/bloom.jpg"});
-    // mockVenueRepo.set("002", {name:"Spark Space", image:"/img/sparkspace.jpg"});
-    // mockVenueRepo.set("003", {name:"The Grand Table", image:"/img/grandtable.jpg"});
     
-    
-    return (
-        <main className="text-center p-5 font-serif">
-            <h1 className="text-lg font-medium text-black">{campgroundDetail.data.name}</h1>
-            <div className="flex flex-row my-5">
-                <Image src={(campgroundDetail.data.picture)}
-                alt="Campground Image"
-                width={0} height={0} sizes="100vw"
-                className="rounded-lg w-[30%]"/>
-                <div className="text-md mx-5 text-black text-left">
-                    <div>Name: { campgroundDetail.data.name}</div>
-                    <div>Address: { campgroundDetail.data.address }</div>
-                    <div>District: { campgroundDetail.data.district }</div>
-                    <div>Province: { campgroundDetail.data.province }</div>
-                    <div>Postal Code: { campgroundDetail.data.postalcode }</div>
-                    <div>Tel: { campgroundDetail.data.tel }</div>
+    // Construct location string from available data
+    const getLocation = () => {
+        const parts = [
+            campgroundDetail.data.address,
+            campgroundDetail.data.district,
+            campgroundDetail.data.province,
+            campgroundDetail.data.postalcode
+        ].filter(Boolean); // Remove empty/null parts
+        
+        return parts.length > 0 ? parts.join(', ') : 'Location not specified';
+    };
 
-                    <Link href={`/booking?id=${params.cid}&name=${campgroundDetail.data.name}`}>
-            <button className="text-white block rounded-md bg-cyan-600 hover:bg-cyan-900 hover:text-black px-3 py-1">
-                Make Booking
-            </button>
-            </Link>
+    return (
+        <main className="text-center p-5 font-sans bg-gray-50 min-h-screen">
+            <h1 className="text-3xl font-semibold text-gray-800 mb-8">{campgroundDetail.data.name}</h1>
+
+            <div className="flex flex-col lg:flex-row items-center justify-center my-5 bg-white shadow-lg rounded-xl p-6 max-w-6xl mx-auto">
+                
+                {/* Campground Image */}
+                <div className="flex-1 w-full lg:w-1/2 mb-6 lg:mb-0 lg:mr-8">
+                    <Image 
+                        src={campgroundDetail.data.picture} 
+                        alt={`${campgroundDetail.data.name} Image`}
+                        width={600}
+                        height={400}
+                        className="rounded-xl w-full h-auto object-cover shadow-md"
+                        priority
+                    />
                 </div>
                 
+                {/* Campground Details */}
+                <div className="flex-1 w-full lg:w-1/2 text-gray-700">
+                    <div className="space-y-4">
+                        {/* Location with icon */}
+                        <div className="flex items-start">
+                            <FiMapPin className="mt-1 mr-2 text-indigo-600" />
+                            <div>
+                                <h2 className="font-medium text-gray-900">Location</h2>
+                                <p>{getLocation()}</p>
+                            </div>
+                        </div>
+                        
+                        {/* Contact with icon */}
+                        {campgroundDetail.data.tel && (
+                            <div className="flex items-start">
+                                <FiPhone className="mt-1 mr-2 text-indigo-600" />
+                                <div>
+                                    <h2 className="font-medium text-gray-900">Contact</h2>
+                                    <p>{campgroundDetail.data.tel}</p>
+                                </div>
+                            </div>
+                        )}
+                        
+                        {/* Additional details can be added here */}
+                        <div className="flex items-start">
+                            <FiHome className="mt-1 mr-2 text-indigo-600" />
+                            <div>
+                                <h2 className="font-medium text-gray-900">Facilities</h2>
+                                <p>Tents, Restrooms, Showers, Fire pits</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Booking Button */}
+                    <Link 
+                        href={`/booking?id=${params.cid}&name=${encodeURIComponent(campgroundDetail.data.name)}`}
+                        className="block mt-8"
+                    >
+                        <button className="w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition duration-300 transform hover:scale-[1.02] shadow-md">
+                            Book Your Stay
+                        </button>
+                    </Link>
+                </div>
             </div>
-           
         </main>
-    )
+    );
 }
-
-// export async function generateStaticParams() {
-//     return [{vid:"001"}, {vid:"002"}, {vid:"003"}]
-// }
