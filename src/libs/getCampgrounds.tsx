@@ -6,7 +6,7 @@ export default async function getCampgrounds(): Promise<CampgroundsJson> {
     const response = await fetch(`${process.env.BACKEND_URL}/api/v1/campgrounds`);
 
     if (!response.ok) {
-      throw new Error("Failed to fetch venues");
+      throw new Error("Failed to fetch campgrounds");
     }
 
     const data: CampgroundsJson = await response.json();

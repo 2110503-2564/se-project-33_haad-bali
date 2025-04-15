@@ -4,6 +4,7 @@ import Image from "next/image";
 import InteractiveCard from "./InteractiveCard";
 import Rating from "@mui/material/Rating";
 import { FiMapPin, FiStar, FiCalendar, FiImage } from "react-icons/fi";
+import { Button } from "@mui/material";
 
 interface CardProps {
   campgroundName: string;
@@ -100,9 +101,9 @@ export default function Card({
               {value ? <span className="ml-2 text-sm text-gray-600">{value.toFixed(1)}</span> : null}
             </div>
           ) : (
-            <div className="flex items-center text-gray-500">
+            <div className="flex items-center text-gray-500" onClick={(e) => e.stopPropagation()}>
               <FiStar className="text-indigo-400 mr-1" />
-              <span className="text-sm">Rate this campground</span>
+              <Button className="text-sm" href="ratings" >Rate this campground</Button>
             </div>
           )}
         </div>
