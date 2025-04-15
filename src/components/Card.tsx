@@ -1,4 +1,5 @@
-'use client'
+'use client';
+
 import React from "react";
 import Image from "next/image";
 import InteractiveCard from "./InteractiveCard";
@@ -7,6 +8,7 @@ import { FiMapPin, FiStar, FiCalendar, FiImage } from "react-icons/fi";
 import { Button } from "@mui/material";
 
 interface CardProps {
+  id: string; 
   campgroundName: string;
   imgSrc?: string;
   onRating?: (rating: number) => void;
@@ -20,27 +22,28 @@ interface CardProps {
   rating?: number;
 }
 
-export default function Card({ 
-  campgroundName, 
-  imgSrc, 
+export default function Card({
+  id,
+  campgroundName,
+  imgSrc,
   onRating,
   location,
   date,
-  rating
+  rating,
 }: CardProps) {
   const [value, setValue] = React.useState<number | null>(rating || 0);
 
   const getLocationString = () => {
     if (!location) return null;
-    
+
     const parts = [
       location.address,
       location.district,
       location.province,
-      location.postalcode
+      location.postalcode,
     ].filter(Boolean);
-    
-    return parts.length > 0 ? parts.join(', ') : null;
+
+    return parts.length > 0 ? parts.join(", ") : null;
   };
 
   const locationString = getLocationString();
@@ -64,7 +67,7 @@ export default function Card({
           </div>
         )}
       </div>
-      
+
       {/* Content */}
       <div className="w-full h-[40%] p-4 flex flex-col">
         {locationString && (
@@ -73,18 +76,18 @@ export default function Card({
             <span className="text-xs line-clamp-1">{locationString}</span>
           </div>
         )}
-        
+
         <h2 className="text-lg font-medium text-gray-800 line-clamp-1 mb-2">
           {campgroundName}
         </h2>
-        
+
         {date && (
           <div className="flex items-center gap-1 text-gray-500 mb-3">
             <FiCalendar className="text-sm" />
             <span className="text-xs">{date}</span>
           </div>
         )}
-        
+
         <div className="mt-auto">
           {onRating ? (
             <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
@@ -103,7 +106,7 @@ export default function Card({
           ) : (
             <div className="flex items-center text-gray-500" onClick={(e) => e.stopPropagation()}>
               <FiStar className="text-indigo-400 mr-1" />
-              <Button className="text-sm" href="ratings" >Rate this campground</Button>
+              <Button className="text-sm" href={`/ratings/${id}`}>Rate this campground</Button> {/* Use `id` */}
             </div>
           )}
         </div>

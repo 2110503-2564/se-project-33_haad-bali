@@ -64,7 +64,7 @@ export default function CampgroundCatalog({ campgroundsJson }: { campgroundsJson
                                         <Card
                                             campgroundName={campgroundItem.name}
                                             imgSrc={campgroundItem.picture}
-                                        />
+                                            id={campgroundItem.id}                                        />
                                     </Link>
                                 ))}
                                 {/* Add empty placeholders if needed to maintain 4 items per row */}

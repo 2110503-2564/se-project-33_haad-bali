@@ -12,10 +12,10 @@ export default function RatingPage({ params }: { params: { cid: string } }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("Fetched data:", params.cid);
     const fetchData = async () => {
       try {
         const data = await getCampground(params.cid);
-        console.log("Fetched data:", data);
         setCampgroundDetail(data);
       } catch (error) {
         console.error("Failed to fetch campground:", error);
@@ -43,19 +43,21 @@ export default function RatingPage({ params }: { params: { cid: string } }) {
   };
 
   return (
+    
     <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-white">
       {/* Left Image Section */}
       <div className="flex flex-col lg:flex-row bg-gray-50 rounded-xl shadow-xl overflow-hidden w-full max-w-4xl">
         <div className="lg:w-1/2 bg-white flex items-center justify-center p-6">
           {!loading && campgroundDetail?.data?.picture && (
-  <div className="relative w-60 h-60">
-    <Image
-      src={campgroundDetail.data.picture}
-      alt="Campground"
-      fill
-      className="object-contain"
-    />
-  </div>
+           <div className="flex items-center justify-center" style={{ width: 320, height: 320 }}>
+           <Image
+             src={campgroundDetail.data.picture}
+             alt="beach"
+             width={320}
+             height={320}
+           />
+         </div>
+         
 )}
         </div>
 
