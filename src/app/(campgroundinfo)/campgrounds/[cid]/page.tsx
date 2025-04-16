@@ -1,11 +1,12 @@
 'use client'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, AwaitedReactNode, JSXElementConstructor, ReactElement, ReactNode, ReactPortal } from 'react';
 import getCampground from "@/libs/getCampground";
 import Image from "next/image";
 import Link from "next/link";
 import { FiMapPin, FiPhone, FiHome } from "react-icons/fi";
 import { FaCampground, FaTree, FaMountain } from "react-icons/fa";
 import { GiWoodCabin } from "react-icons/gi";
+import getACampgroundReviews from '@/libs/getACampgroundReviews';
 
 function CampgroundLoading() {
   return (
@@ -46,12 +47,15 @@ function CampgroundLoading() {
 export default function CampgroundDetailPage({ params }: { params: { cid: string } }) {
   const [campgroundDetail, setCampgroundDetail] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-
+  const [reviews, setReviews] = useState<any>(null);
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
         const data = await getCampground(params.cid);
+        const review = await getACampgroundReviews(params.cid);
         setCampgroundDetail(data);
+        setReviews(review);
       } catch (error) {
         console.error("Failed to fetch campground:", error);
       } finally {
@@ -138,6 +142,39 @@ export default function CampgroundDetailPage({ params }: { params: { cid: string
               Book Your Stay
             </button>
           </Link>
+          {/* Reviews Section */}
+          <section className="max-w-4xl mx-auto mt-12 p-6 bg-white rounded-xl shadow-md">
+  <h2 className="text-2xl font-semibold text-gray-800 mb-4">Reviews</h2>
+
+  {Array.isArray(reviews.data) && reviews.data.length > 0 ? (
+  reviews.data.map((review: any) => (
+    <div key={review._id} className="mb-4 p-4 bg-white shadow rounded-lg">
+      <div className="flex justify-between items-center mb-1">
+        <p className="text-gray-700 font-medium">
+          {typeof review.user === 'object' ? review.user.name : `User: ${review.user}`}
+        </p>
+        <p className="text-yellow-500 text-lg">
+          {'★'.repeat(review.star)}{'☆'.repeat(5 - review.star)}
+        </p>
+      </div>
+      <p className="text-gray-600">{review.text}</p>
+      <p className="text-sm text-gray-400">{new Date(review.createdAt).toLocaleDateString()}</p>
+    </div>
+  ))
+) : (
+  <p className="text-gray-500">No reviews yet.</p>
+)}
+
+  <Link 
+            href={`/ratings/${params.cid}`}
+            className="block mt-8"
+          >
+            <button className="w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition duration-300 transform hover:scale-[1.02] shadow-md">
+              Add your review
+            </button>
+          </Link>
+</section>
+
         </div>
       </div>
     </main>
