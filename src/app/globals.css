@@ -43,7 +43,14 @@
   --card-rgb: 180, 185, 188;
   --card-border-rgb: 131, 134, 135;
 }
+@keyframes popIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
 
+.animate-popIn {
+  animation: popIn 0.3s ease-out forwards;
+}
  @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
