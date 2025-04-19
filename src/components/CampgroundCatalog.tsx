@@ -74,6 +74,7 @@ export default function CampgroundCatalog({ campgroundsJson }: { campgroundsJson
                                     <div key={`empty-${i}`} className="w-1/4 px-2"></div>
                                 ))}
                             </div>
+                            
                         ))}
                     </div>
                 </div>
