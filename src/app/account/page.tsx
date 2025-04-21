@@ -7,7 +7,7 @@ import { toast } from "react-toastify"; // Importing toastify for notifications
 
 export default function Account() {
   // State to store user profile data
-  const [user, setUser] = useState<{ name: string; username: string; email: string; tel: string; createdAt: string } | null>(null);
+  const [user, setUser] = useState<{ name: string; username: string; email: string; tel: string; createdAt: string ; role: string} | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Fetch user profile
@@ -25,6 +25,7 @@ export default function Account() {
             email: profile.data.email,
             tel: profile.data.telephone,
             createdAt: profile.data.createdAt,
+            role: profile.data.role
           });
         } catch (error) {
           console.error("Error fetching user profile:", error);
@@ -44,6 +45,7 @@ export default function Account() {
   }
 
   return (
+    
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <h1 className="text-3xl font-bold text-center text-gray-900 mb-6">Your Account</h1>
 
@@ -57,6 +59,7 @@ export default function Account() {
             <div className="mb-2"><strong>Username:</strong> {user.username}</div>
             <div className="mb-2"><strong>Telephone:</strong> {user.tel}</div>
             <div className="mb-2"><strong>Account Created:</strong> {new Date(user.createdAt).toLocaleDateString()}</div>
+            <div className="mb-2"><strong>Role:</strong> {user.role}</div>
           </div>
         ) : (
           <p>No user data available</p>

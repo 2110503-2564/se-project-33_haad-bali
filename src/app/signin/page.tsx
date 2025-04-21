@@ -27,7 +27,9 @@ export default function LoginPage() {
       if (result?.error) {
         setError(result.error);
       } else {
-        router.push('/home');
+        router.push('/home'); 
+
+         setTimeout(() => router.refresh(), 100); // Delay refresh by 1 second
       }
     } catch (err) {
       setError('An unexpected error occurred');

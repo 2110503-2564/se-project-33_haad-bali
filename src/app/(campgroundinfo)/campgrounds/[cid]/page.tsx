@@ -11,6 +11,7 @@ import { updateReview } from "@/libs/updateReview";
 import { deleteReview } from "@/libs/deleteReview";
 import { FaCampground, FaTree, FaMountain } from "react-icons/fa";
 import { GiWoodCabin } from "react-icons/gi";
+import getUserProfile from '@/libs/getUserProfile';
 function CampgroundLoading() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-50 flex flex-col items-center justify-center">
@@ -58,7 +59,34 @@ export default function CampgroundDetailPage({ params }: { params: { cid: string
   const [hoverStar, setHoverStar] = useState(0);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
+  const [user, setUser] = useState<{ name: string; username: string; email: string; tel: string; createdAt: string ; role: string;_id:string} | null>(null);
 
+    useEffect(() => {
+      const fetchUserProfile = async () => {
+        const session = await getSession();
+        const token = (session?.user as any)?.token;
+  
+        if (token) {
+          try {
+            const profile = await getUserProfile(token);
+            setUser({
+              name: profile.data.name,
+              username: profile.data.username,
+              email: profile.data.email,
+              tel: profile.data.telephone,
+              createdAt: profile.data.createdAt,
+              role: profile.data.role,
+              _id: profile.data._id
+            });
+          } catch (error) {
+            console.error("Error fetching user profile:", error);
+          }
+        } else {
+        }
+      };
+  
+      fetchUserProfile();
+    }, []);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -269,7 +297,9 @@ export default function CampgroundDetailPage({ params }: { params: { cid: string
                     transition={{ duration: 0.3 }}
                     className="mb-4 p-4 bg-white shadow rounded-lg"
                   >
+                    
                     <div className="flex justify-between items-center mb-1">
+             
                       <p className="text-gray-700 font-medium">
                         {typeof review.user === 'object' ? review.user.name : `User: ${review.user}`}
                       </p>
@@ -277,9 +307,11 @@ export default function CampgroundDetailPage({ params }: { params: { cid: string
                         {'★'.repeat(review.star)}{'☆'.repeat(5 - review.star)}
                       </p>
                     </div>
+                    
+                    
                     <p className="text-gray-600">{review.text}</p>
                     <p className="text-sm text-gray-400">{new Date(review.createdAt).toLocaleDateString()}</p>
-
+                 { (user?.role === "admin" || user?._id === review.user._id)  && (
                     <div className="flex space-x-4 mt-2">
                       <motion.button 
                         whileHover={{ scale: 1.1 }}
@@ -294,8 +326,9 @@ export default function CampgroundDetailPage({ params }: { params: { cid: string
                         onClick={() => handleDeleteReview(review._id)}
                       >
                         <FiTrash2 className="text-red-600" />
-                      </motion.button>
+                      </motion.button>  
                     </div>
+                      )}
                   </motion.div>
                 ))}
               </AnimatePresence>

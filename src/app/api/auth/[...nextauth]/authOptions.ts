@@ -1,7 +1,6 @@
 import { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import userLogin from "@/libs/userLogin"; // This is the function that handles login logic
-
 export const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
@@ -24,7 +23,6 @@ export const authOptions: AuthOptions = {
       },
     }),
   ],
-  
   session: { strategy: "jwt" },
   callbacks: {
     async jwt({token,user}) {
