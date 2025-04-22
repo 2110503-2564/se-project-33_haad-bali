@@ -36,3 +36,17 @@ export interface BookingItem {
   
   
 }
+export interface PromotionJson {
+  success: boolean;
+  count: number;
+  pagination: Object;
+  data: PromotionItem[];
+}
+export interface PromotionItem {
+  _id:string,
+  promotionCode:string,
+  discountPercentage:number,
+  expiredDate: string | number | Date,
+  minSpend:number,
+  usedCount:number
+}
