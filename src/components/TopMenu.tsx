@@ -30,7 +30,6 @@ export function TopMenu({ session }: TopMenuClientProps) {
         <span className="text-2xl font-extrabold text-white mt-1 ">WILDSTAY</span>
       </div>
       <div className={styles.rightSection}>
-      <TopMenuItem title="Promotion" pageRef="/promotion" />
         <TopMenuItem title="Booking" pageRef="/booking" />
         <TopMenuItem title="My Booking" pageRef="/mybooking" />
         {/* Dropdown Container */}

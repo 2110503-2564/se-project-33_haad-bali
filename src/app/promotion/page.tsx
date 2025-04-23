@@ -49,7 +49,7 @@ export default function Promotion() {
     })} </div>
               </div>
               <button className="w-24 py-3 font-bold bg-black text-white uppercase tracking-wider hover:bg-white hover:text-black transition-colors">
-                CLAIM
+                APPLY
               </button>
             </div>
           ))}

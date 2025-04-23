@@ -428,11 +428,14 @@ export default function Booking() {
               )}
 
               {/* Book Button */}
-              <div className="text-center">
+              <div className="text-center flex col">
+                <button className="w-1/5 bg-black text-white p-3 rounded-md disabled:opacity-50 active:bg-gray-800 focus:bg-black focus:outline-none mr-2">
+                  Promotion
+                </button>
                 <button
                   onClick={makeBooking}
                   disabled={isLoading}
-                  className="w-full bg-black text-white p-3 rounded-md disabled:opacity-50 active:bg-gray-800 focus:bg-black focus:outline-none"
+                  className="w-4/5 bg-black text-white p-3 rounded-md disabled:opacity-50 active:bg-gray-800 focus:bg-black focus:outline-none"
                 >
                   {isLoading ? 'Processing...' : 'Book Now'}
                 </button>
