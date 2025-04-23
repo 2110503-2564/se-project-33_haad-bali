@@ -7,18 +7,20 @@ import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { addBooking } from "@/redux/features/bookSlice";
-import { BookingItem, CampgroundItem } from "../../../interface";
+import { BookingItem, CampgroundItem, PromotionItem, PromotionJson } from "../../../interface";
 import { getSession } from "next-auth/react";
 import getUserProfile from "@/libs/getUserProfile";
 import getCampgrounds from "@/libs/getCampgrounds";
 import { toast } from "react-toastify";
 import DatePickerComponent from "@/components/DatePickerComponent";
 import createBooking from "@/libs/createBooking";
+import getPromotions from "@/libs/getPromotions";
 
 export default function Booking() {
   const urlParams = useSearchParams();
   const cid = urlParams.get('id');
   const name = urlParams.get('name');
+  const [showPromotionPopup, setShowPromotionPopup] = useState(false);
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -34,6 +36,7 @@ export default function Booking() {
   const [campgroundHasBreakfast, setCampgroundHasBreakfast] = useState<boolean>(false);
   const [campgrounds, setCampgrounds] = useState<CampgroundItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [editingBooking, setEditingBooking] = useState< null>(null);
 
   // Validation states
   const [nameError, setNameError] = useState<string>('');
@@ -41,7 +44,27 @@ export default function Booking() {
   const [checkInError, setCheckInError] = useState<string>('');
   const [checkOutError, setCheckOutError] = useState<string>('');
   const [locationError, setLocationError] = useState<string>('');
-
+  const [promotions, setPromotions] = useState<PromotionItem[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+  
+    useEffect(() => {
+      const fetchPromotions = async () => {
+        try {
+          const pro: PromotionJson = await getPromotions();
+          setPromotions(pro.data);
+        } catch (err) {
+          setError(err instanceof Error ? err.message : 'Failed to fetch promotions');
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchPromotions();
+    }, []);
+  const handleEditClick = () => {
+    setEditingBooking(null);
+};
   // Fetch data
   useEffect(() => {
     const fetchData = async () => {
@@ -429,7 +452,10 @@ export default function Booking() {
 
               {/* Book Button */}
               <div className="text-center flex col">
-                <button className="w-1/5 bg-black text-white p-3 rounded-md disabled:opacity-50 active:bg-gray-800 focus:bg-black focus:outline-none mr-2">
+                
+                <button 
+                onClick={() => setShowPromotionPopup(true)}
+                className="w-1/5 bg-black text-white p-3 rounded-md disabled:opacity-50 active:bg-gray-800 focus:bg-black focus:outline-none mr-2">
                   Promotion
                 </button>
                 <button
@@ -444,6 +470,41 @@ export default function Booking() {
           </div>
         </div>
       </div>
+      
+      {showPromotionPopup && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white rounded-lg shadow-xl p-6 max-w-lg w-full">
+      <h3 className="text-lg font-semibold mb-4">Available Promotions</h3>
+      <div className="flex flex-col items-center justify-center gap-8">
+          {promotions.map((promo) => (
+            <div key={promo._id} className="w-full max-w-3xl h-40 border border-gray-200 rounded-lg shadow-sm flex flex-row items-center justify-center p-6 bg-white">
+              <div className="text-3xl font-bold mb-2 mr-auto">code : {promo.promotionCode}</div>
+              <div className="text-3xl font-bold mb-2 mr-auto">{promo.discountPercentage}% OFF
+                <div className="text-lg font-normal mb-2 mt-1">valid until : {new Date(promo.expiredDate).toLocaleDateString
+  ('en-UK', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })} </div>
+              </div>
+              <button className="w-24 py-3 font-bold bg-black text-white uppercase tracking-wider hover:bg-white hover:text-black transition-colors">
+                APPLY
+              </button>
+            </div>
+          ))}
+        </div>
+      <div className="mt-4 text-right">
+        <button
+          onClick={() => setShowPromotionPopup(false)}
+          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
