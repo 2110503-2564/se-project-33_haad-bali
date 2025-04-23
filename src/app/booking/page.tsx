@@ -15,7 +15,8 @@ import { toast } from "react-toastify";
 import DatePickerComponent from "@/components/DatePickerComponent";
 import createBooking from "@/libs/createBooking";
 import getPromotions from "@/libs/getPromotions";
-
+import { motion } from "framer-motion";
+import { X } from "lucide-react"; 
 export default function Booking() {
   const urlParams = useSearchParams();
   const cid = urlParams.get('id');
@@ -36,7 +37,6 @@ export default function Booking() {
   const [campgroundHasBreakfast, setCampgroundHasBreakfast] = useState<boolean>(false);
   const [campgrounds, setCampgrounds] = useState<CampgroundItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [editingBooking, setEditingBooking] = useState< null>(null);
 
   // Validation states
   const [nameError, setNameError] = useState<string>('');
@@ -62,9 +62,7 @@ export default function Booking() {
   
       fetchPromotions();
     }, []);
-  const handleEditClick = () => {
-    setEditingBooking(null);
-};
+
   // Fetch data
   useEffect(() => {
     const fetchData = async () => {
@@ -472,37 +470,65 @@ export default function Booking() {
       </div>
       
       {showPromotionPopup && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-white rounded-lg shadow-xl p-6 max-w-lg w-full">
-      <h3 className="text-lg font-semibold mb-4">Available Promotions</h3>
-      <div className="flex flex-col items-center justify-center gap-8">
-          {promotions.map((promo) => (
-            <div key={promo._id} className="w-full max-w-3xl h-40 border border-gray-200 rounded-lg shadow-sm flex flex-row items-center justify-center p-6 bg-white">
-              <div className="text-3xl font-bold mb-2 mr-auto">code : {promo.promotionCode}</div>
-              <div className="text-3xl font-bold mb-2 mr-auto">{promo.discountPercentage}% OFF
-                <div className="text-lg font-normal mb-2 mt-1">valid until : {new Date(promo.expiredDate).toLocaleDateString
-  ('en-UK', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })} </div>
-              </div>
-              <button className="w-24 py-3 font-bold bg-black text-white uppercase tracking-wider hover:bg-white hover:text-black transition-colors">
-                APPLY
-              </button>
-            </div>
-          ))}
-        </div>
-      <div className="mt-4 text-right">
-        <button
-          onClick={() => setShowPromotionPopup(false)}
-          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-        >
-          Close
-        </button>
-      </div>
-    </div>
-  </div>
+
+ <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+   <motion.div 
+     initial={{ opacity: 0, scale: 0.9 }}
+     animate={{ opacity: 1, scale: 1 }}
+     exit={{ opacity: 0, scale: 0.9 }}
+     transition={{ duration: 0.2 }}
+     className="bg-white rounded-lg shadow-2xl p-8 w-[90vw] max-w-6xl max-h-[90vh] overflow-y-auto relative"
+   >
+     {/* Close X button */}
+     <button
+       onClick={() => setShowPromotionPopup(false)}
+       className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
+       aria-label="Close"
+     >
+       <X className="w-10 h-10 text-red-500" />
+     </button>
+
+     <h3 className="text-2xl font-bold mb-6 text-center">Available Promotions</h3>
+     
+     <div className="grid grid-cols-1 gap-6">
+       {promotions.map((promo) => (
+         <motion.div
+           key={promo._id}
+           whileHover={{ scale: 1.02 }}
+           transition={{ type: "spring", stiffness: 300 }}
+           className="w-full h-48 border-2 border-gray-100 rounded-xl shadow-md flex flex-row items-center justify-between p-8 bg-gradient-to-r from-gray-50 to-white"
+         >
+           <div className="flex flex-col items-start">
+             <span className="text-sm font-semibold text-gray-500 mb-1">PROMO CODE</span>
+             <div className="text-4xl font-extrabold text-gray-800">{promo.promotionCode}</div>
+           </div>
+
+           <div className="flex flex-col items-center">
+             <span className="text-5xl font-bold text-green-600">
+               {promo.discountPercentage}% OFF
+             </span>
+             <div className="text-lg font-medium text-gray-500 mt-2">
+               Valid until: {new Date(promo.expiredDate).toLocaleDateString('en-UK', {
+                 year: 'numeric',
+                 month: 'long',
+                 day: 'numeric'
+               })}
+             </div>
+           </div>
+
+           <motion.button
+             whileHover={{ scale: 1.05 }}
+             whileTap={{ scale: 0.95 }}
+             className="w-32 py-4 px-6 font-bold bg-black text-white uppercase tracking-wider rounded-lg hover:bg-white hover:text-black border-2 border-black transition-all"
+           >
+             APPLY
+           </motion.button>
+         </motion.div>
+       ))}
+     </div>
+   </motion.div>
+ </div>
+
 )}
 
     </div>
