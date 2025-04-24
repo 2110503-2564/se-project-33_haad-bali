@@ -499,41 +499,46 @@ export default function Booking() {
   ) : (
     promotions.map((promo) => (
       <motion.div
-        key={promo._id}
-        whileHover={{ scale: 1.02 }}
-        transition={{ type: "spring", stiffness: 300 }}
-        className="w-full h-48 border-2 border-gray-100 rounded-xl shadow-md flex flex-row items-center justify-between p-8 bg-gradient-to-r from-gray-50 to-white"
-      >
-        <div className="flex flex-col items-start">
-          <span className="text-xs sm:text-sm font-semibold text-gray-500 mb-1">
-            PROMO CODE
-          </span>
-          <div className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-800">
-            {promo.promotionCode}
-          </div>
-        </div>
+  key={promo._id}
+  whileHover={{ scale: 1.02 }}
+  transition={{ type: "spring", stiffness: 300 }}
+  className="w-full h-48 border-2 border-gray-100 rounded-xl shadow-md flex items-center justify-between p-8 bg-gradient-to-r from-gray-50 to-white"
+>
+  {/* Left side: Promo Code */}
+  <div className="flex flex-col items-start pr-6"> {/* tighter padding */}
+    <span className="text-xs sm:text-sm font-semibold text-gray-500 mb-1">PROMO CODE</span>
+    <div className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-800">
+      {promo.promotionCode}
+    </div>
+  </div>
 
-        <div className="flex flex-col items-center">
-          <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-green-600">
-            {promo.discountPercentage}% OFF
-          </span>
-          <div className="text-sm sm:text-base md:text-lg font-medium text-gray-500 mt-2 text-center">
-            Valid until: {new Date(promo.expiredDate).toLocaleDateString('en-UK', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })}
-          </div>
-        </div>
+  {/* Vertical Divider - moved closer to black text */}
+  <div className="h-24 w-px bg-gray-300 mx-2"></div>
 
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="w-28 sm:w-32 py-3 sm:py-4 px-4 sm:px-6 text-sm sm:text-base font-bold bg-black text-white uppercase tracking-wider rounded-lg hover:bg-white hover:text-black border-2 border-black transition-all"
-        >
-          APPLY
-        </motion.button>
-      </motion.div>
+  {/* Discount Info - shifted left using ml-4 instead of px */}
+  <div className="flex flex-col items-center ml-4">
+    <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-green-600">
+      {promo.discountPercentage}% OFF
+    </span>
+    <div className="text-sm sm:text-base md:text-lg font-medium text-gray-500 mt-2 text-center">
+      Valid until: {new Date(promo.expiredDate).toLocaleDateString('en-UK', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })}
+    </div>
+  </div>
+
+  {/* Apply Button */}
+  <motion.button
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    className="w-28 sm:w-32 py-3 sm:py-4 px-4 sm:px-6 text-sm sm:text-base font-bold bg-black text-white uppercase tracking-wider rounded-lg hover:bg-white hover:text-black border-2 border-black transition-all"
+  >
+    APPLY
+  </motion.button>
+</motion.div>
+
     ))
   )}
 </div>
