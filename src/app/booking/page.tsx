@@ -504,18 +504,18 @@ export default function Booking() {
   transition={{ type: "spring", stiffness: 300 }}
   className="w-full h-48 border-2 border-gray-100 rounded-xl shadow-md flex items-center justify-between p-8 bg-gradient-to-r from-gray-50 to-white"
 >
-  {/* Left side: Promo Code */}
-  <div className="flex flex-col items-start pr-6"> {/* tighter padding */}
-    <span className="text-xs sm:text-sm font-semibold text-gray-500 mb-1">PROMO CODE</span>
-    <div className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-800">
-      {promo.promotionCode}
+  {/* Promo code + Divider */}
+  <div className="flex items-center gap-6">
+    <div className="flex flex-col items-start">
+      <span className="text-xs sm:text-sm font-semibold text-gray-500 mb-1">PROMO CODE</span>
+      <div className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-800">
+        {promo.promotionCode}
+      </div>
     </div>
+    <div className="h-16 w-px bg-gray-300" />
   </div>
 
-  {/* Vertical Divider - moved closer to black text */}
-  <div className="h-24 w-px bg-gray-300 mx-2"></div>
-
-  {/* Discount Info - shifted left using ml-4 instead of px */}
+  {/* Discount block - nudged slightly right */}
   <div className="flex flex-col items-center ml-4">
     <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-green-600">
       {promo.discountPercentage}% OFF
@@ -529,7 +529,7 @@ export default function Booking() {
     </div>
   </div>
 
-  {/* Apply Button */}
+  {/* Apply button */}
   <motion.button
     whileHover={{ scale: 1.05 }}
     whileTap={{ scale: 0.95 }}
