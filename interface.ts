@@ -1,4 +1,6 @@
 export interface CampgroundItem {
+  breakfastPrice: number;
+  pricePerNight: number;
   _id: string;
   name: string;
   address: string;
@@ -33,7 +35,7 @@ export interface BookingItem {
   apptDate: string | number | Date;
   user:string;
   tel: string;
-  
+  totalPrice: number
   
 }
 export interface PromotionJson {

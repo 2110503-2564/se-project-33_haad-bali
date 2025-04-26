@@ -17,14 +17,18 @@ import createBooking from "@/libs/createBooking";
 import getPromotions from "@/libs/getPromotions";
 import { motion } from "framer-motion";
 import { X } from "lucide-react"; 
+import applyPromotion from "@/libs/applyPromotion";
 export default function Booking() {
   const urlParams = useSearchParams();
   const cid = urlParams.get('id');
   const name = urlParams.get('name');
   const [showPromotionPopup, setShowPromotionPopup] = useState(false);
+  const [breakfastPrice, setBreakfastPrice] = useState<number>(0);
 
   const dispatch = useDispatch<AppDispatch>();
-
+  const [selectedPromotion, setSelectedPromotion] = useState<PromotionItem | null>(null);
+  const [originalPrice, setOriginalPrice] = useState<number>(0);
+  const [discountedPrice, setDiscountedPrice] = useState<number>(0);
   // State management
   const [bookLocation, setBookLocation] = useState<string>('');
   const [nameLastname, setNameLastname] = useState<string>('');
@@ -62,7 +66,16 @@ export default function Booking() {
   
       fetchPromotions();
     }, []);
-
+    const handleApplyPromotion = (promo: PromotionItem) => {
+      setSelectedPromotion(promo);
+      setShowPromotionPopup(false);
+      toast.success(`Promotion ${promo.promotionCode} applied!`);
+    };
+  
+    const removePromotion = () => {
+      setSelectedPromotion(null);
+      toast.info("Promotion removed");
+    };
   // Fetch data
   useEffect(() => {
     const fetchData = async () => {
@@ -99,6 +112,31 @@ export default function Booking() {
     
     fetchData();
   }, []);  
+  useEffect(() => {
+    if (bookLocation && stayDuration > 0) {
+      const selectedCampground = campgrounds.find(camp => camp.id === bookLocation);
+      if (selectedCampground) {
+        // Calculate base price
+        const basePrice = selectedCampground.pricePerNight * stayDuration;
+        setOriginalPrice(basePrice);
+        
+        // Calculate breakfast price if selected
+        let breakfastTotal = 0;
+        if (breakfast && selectedCampground.breakfastPrice) {
+          breakfastTotal = selectedCampground.breakfastPrice * stayDuration;
+        }
+        setBreakfastPrice(breakfastTotal);
+        
+        // Apply promotion if selected
+        if (selectedPromotion) {
+          const discountAmount = basePrice * (selectedPromotion.discountPercentage / 100);
+          setDiscountedPrice(basePrice - discountAmount + breakfastTotal);
+        } else {
+          setDiscountedPrice(basePrice + breakfastTotal);
+        }
+      }
+    }
+  }, [bookLocation, stayDuration, breakfast, selectedPromotion, campgrounds]);
 
   // Calculate stay duration
   useEffect(() => {
@@ -212,24 +250,39 @@ export default function Booking() {
       return;
     }
 
-    const bookingItem: BookingItem = {
-      _id: "",
-      CheckInDate: checkInDateISO,
-      CheckOutDate: checkOutDateISO,
-      tel: tel,
-      campground: selectedCampground,
-      breakfast: campgroundHasBreakfast ? breakfast : false,
-      apptDate: new Date().toISOString(),
-      user: ""
-    };
-
-    dispatch(addBooking(bookingItem));
-
     try {
       const session = await getSession();
       const token = (session?.user as any)?.token;
 
       if (token) {
+        // Apply promotion at booking time
+        let finalPrice = originalPrice + breakfastPrice;
+        if (selectedPromotion) {
+          const promotionResult = await applyPromotion(
+            token,
+            selectedPromotion.promotionCode,
+            originalPrice
+          );
+          
+          if (promotionResult) {
+            finalPrice = promotionResult.discountedPrice + breakfastPrice;
+          }
+        }
+
+        const bookingItem: BookingItem = {
+          _id: "",
+          CheckInDate: checkInDateISO,
+          CheckOutDate: checkOutDateISO,
+          tel: tel,
+          campground: selectedCampground,
+          breakfast: campgroundHasBreakfast ? breakfast : false,
+          apptDate: new Date().toISOString(),
+          user: "",
+          totalPrice: finalPrice
+        };
+
+        dispatch(addBooking(bookingItem));
+
         const response = await createBooking(token, {
           nameLastname,
           tel,
@@ -237,7 +290,8 @@ export default function Booking() {
           CheckInDate: checkInDateISO,
           CheckOutDate: checkOutDateISO,
           userId: (session?.user as any)?.id,
-          breakfast: campgroundHasBreakfast ? breakfast:false
+          breakfast: campgroundHasBreakfast ? breakfast : false,
+          totalPrice: finalPrice
         });
 
         if (response.success) {
@@ -250,7 +304,6 @@ export default function Booking() {
       toast.error("Booking error occurred");
     }
   };
-
   return (
     <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
@@ -467,8 +520,51 @@ export default function Booking() {
             </div>
           </div>
         </div>
-      </div>
       
+      {bookLocation && stayDuration > 0 && (
+        <div className="bg-gray-100 p-6 rounded-lg mt-6">
+          <h3 className="text-lg font-semibold mb-4">Price Summary</h3>
+          
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span>{stayDuration} night{stayDuration !== 1 ? 's' : ''} × ${campgrounds.find(camp => camp.id === bookLocation)?.pricePerNight}</span>
+              <span>${originalPrice.toFixed(2)}</span>
+            </div>
+            
+            {breakfast && (
+              <div className="flex justify-between">
+                <span>Breakfast × {stayDuration}</span>
+                <span>${breakfastPrice.toFixed(2)}</span>
+              </div>
+            )}
+            
+            {selectedPromotion && (
+              <div className="flex justify-between text-green-600">
+                <span>Promo: {selectedPromotion.promotionCode} ({selectedPromotion.discountPercentage}% off)</span>
+                <span>-${(originalPrice * (selectedPromotion.discountPercentage / 100)).toFixed(2)}</span>
+              </div>
+            )}
+            
+            <div className="border-t border-gray-300 pt-2 mt-2 flex justify-between font-bold">
+              <span>Total</span>
+              <span>${discountedPrice.toFixed(2)}</span>
+            </div>
+            
+            {selectedPromotion && (
+              <button 
+                onClick={removePromotion}
+                className="text-red-500 text-sm mt-2 hover:underline"
+              >
+                Remove promotion
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+</div>
+
+            
+  
       {showPromotionPopup && (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
     <motion.div 
@@ -531,6 +627,7 @@ export default function Booking() {
 
   {/* Apply button */}
   <motion.button
+    onClick={() => handleApplyPromotion(promo)}
     whileHover={{ scale: 1.05 }}
     whileTap={{ scale: 0.95 }}
     className="w-28 sm:w-32 py-3 sm:py-4 px-4 sm:px-6 text-sm sm:text-base font-bold bg-black text-white uppercase tracking-wider rounded-lg hover:bg-white hover:text-black border-2 border-black transition-all"
@@ -545,7 +642,9 @@ export default function Booking() {
 
     </motion.div>
   </div>
-)}
+)}s
     </div>
   );
 }
+
+
