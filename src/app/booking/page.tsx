@@ -18,6 +18,7 @@ import getPromotions from "@/libs/getPromotions";
 import { motion } from "framer-motion";
 import { X } from "lucide-react"; 
 import applyPromotion from "@/libs/applyPromotion";
+import router, { useRouter } from "next/router";
 export default function Booking() {
   const urlParams = useSearchParams();
   const cid = urlParams.get('id');
@@ -295,10 +296,12 @@ export default function Booking() {
         });
 
         if (response.success) {
-          toast.success("Booking successful!");
+          console.log("Booking successful!");
+          
         } else {
           toast.error(response.message || "Booking failed");
         }
+        window.location.href = '/mybooking';
       }
     } catch (error) {
       toast.error("Booking error occurred");

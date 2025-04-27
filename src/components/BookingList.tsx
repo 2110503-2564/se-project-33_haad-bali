@@ -11,10 +11,10 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { toast } from "react-toastify";
 import getUserProfile from "@/libs/getUserProfile";
-import { CampgroundItem } from "../../interface";
+import { BookingItem, CampgroundItem } from "../../interface";
 import { duration } from "@mui/material";
 import { useRouter } from "next/navigation";
-
+import { MdMonetizationOn } from "react-icons/md";
 
 const NavigateTwoPages = () => {
   const router = useRouter();
@@ -40,16 +40,7 @@ interface User {
   createdAt: string;
 }
 
-interface BookingItem {
-  _id: string;
-  user: string;
-  campground:  CampgroundItem;
-  apptDate: string | number | Date;
-  CheckInDate: string;
-  CheckOutDate: string;
-  breakfast: boolean;
-  tel: string;
-}
+
 
 export default function BookingList() {
     const { data: session, status } = useSession();
@@ -66,7 +57,14 @@ export default function BookingList() {
     });
     const [stayDuration, setStayDuration] = useState<number>(0);
     const [currentUser, setCurrentUser] = useState<User | null>(null);
-
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [itemsPerPage] = useState<number>(10);
+    const [totalBookings, setTotalBookings] = useState<number>(0);
+    // Calculate current items to display
+const indexOfLastItem = currentPage * itemsPerPage;
+const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+const currentItems = bookItems.slice(indexOfFirstItem, indexOfLastItem);
+const totalPages = Math.ceil(totalBookings / itemsPerPage);
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -266,37 +264,35 @@ export default function BookingList() {
 
     const fetchBookings = async () => {
         if (status === "authenticated" && session?.user) {
-            try {
-                const token = (session?.user as any)?.token;
-                if (token) {
-                    setIsLoading(true);
-                    setError("");
-                    const bookingsResponse = await getBookings(token);
-                    
-                    if (Array.isArray(bookingsResponse.data)) {
-                        dispatch(resetBookings());
-                        bookingsResponse.data.forEach((booking:BookingItem ) => dispatch(addBooking(booking)));
-                    } else {
-                        setError("Bookings data is not an array.");
-                    }
-                } else {
-                    setError("No token found in session.");
-                }
-            } catch (error: any) {
-                console.error("Failed to load bookings:", error);
-                setError("Failed to load bookings");
-            } finally {
-                setIsLoading(false);
+          try {
+            const token = (session?.user as any)?.token;
+            if (token) {
+              setIsLoading(true);
+              setError("");
+              const bookingsResponse = await getBookings(token, 1, 1000);
+              setTotalBookings(bookingsResponse.count || 0);
+              
+              if (Array.isArray(bookingsResponse.data)) {
+                dispatch(resetBookings());
+                bookingsResponse.data.forEach((booking: BookingItem) => 
+                  dispatch(addBooking(booking))
+                );
+              } else {
+                setError("Bookings data is not an array.");
+              }
             }
-        } else {
-            setError("User not authenticated or session expired.");
+          } catch (error: any) {
+            console.error("Failed to load bookings:", error);
+            setError("Failed to load bookings");
+          } finally {
             setIsLoading(false);
+          }
         }
-    };
+      };
 
-    useEffect(() => {
+      useEffect(() => {
         fetchBookings();
-    }, [session, status]);
+      }, [session, status, currentPage]);
     const getUserDisplay = (user: User | string | undefined, currentUser: User | null) => {
         // If no user data is available
         if (!user) return { 
@@ -343,10 +339,10 @@ export default function BookingList() {
             <div className="text-center mb-10">
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">Your Bookings</h1>
                 <p className="text-gray-600">
-                    {bookItems.length === 0 
-                        ? "You don't have any bookings yet" 
-                        : `Showing ${bookItems.length} ${bookItems.length === 1 ? 'booking' : 'bookings'}`}
-                </p>
+  {totalBookings === 0 
+    ? "You don't have any bookings yet" 
+    : `Showing ${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, totalBookings)} of ${totalBookings} ${totalBookings === 1 ? 'booking' : 'bookings'}`}
+</p>
             </div>
 
             {error && (
@@ -372,7 +368,7 @@ export default function BookingList() {
                 </div>
             ) : (
                 <div className="space-y-5">
-                    {bookItems.map((booking, index) => {
+                    {currentItems.map((booking, index) => {
                         const userInfo = getUserDisplay(booking.user, currentUser);
                         return (
                             <div key={index} className="bg-white overflow-hidden shadow rounded-lg transition-all duration-200 hover:shadow-md">
@@ -383,7 +379,7 @@ export default function BookingList() {
                                                 <FiMapPin className="mr-2 text-blue-500" />
                                                 {booking.campground?.name || "Unknown Campground"}
                                             </h3>
-                                            <p className="mt-1 text-sm text-gray-500">Booking #{index + 1}</p>
+                                            <p className="mt-1 text-sm text-gray-500">Booking #{(index + 1)+((currentPage-1)*10)}</p>
                                         </div>
                                         <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                             Confirmed
@@ -443,7 +439,16 @@ export default function BookingList() {
                                             <div className="ml-3">
                                                 <p className="text-sm font-medium text-gray-500">Breakfast</p>
                                                 <p className="text-sm text-gray-900">
-                                                    {booking.breakfast ? "Included (+฿200)" : "Not included"}
+                                                    {booking.breakfast ? "Included " : "Not included"}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center">
+                                            <MdMonetizationOn className="flex-shrink-0 h-5 w-5 text-gray-400" />
+                                            <div className="ml-3">
+                                                <p className="text-sm font-medium text-gray-500">Price</p>
+                                                <p className="text-sm text-gray-900">
+                                                    {booking.totalPrice}$
                                                 </p>
                                             </div>
                                         </div>
@@ -468,6 +473,29 @@ export default function BookingList() {
                     })}
                 </div>
             )}
+            {totalBookings > itemsPerPage && (
+  <div className="flex justify-center mt-8">
+    <nav className="inline-flex rounded-md shadow">
+      <button
+        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+        disabled={currentPage === 1}
+        className="px-4 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Previous
+      </button>
+      <span className="px-4 py-2 border-t border-b border-gray-300 bg-white text-sm font-medium text-gray-700">
+        Page {currentPage} of {Math.ceil(totalBookings / itemsPerPage)}
+      </span>
+      <button
+        onClick={() => setCurrentPage(prev => prev + 1)}
+        disabled={currentPage >= Math.ceil(totalBookings / itemsPerPage)}
+        className="px-4 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Next
+      </button>
+    </nav>
+  </div>
+)}
 
 {               editingBooking && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -538,7 +566,7 @@ export default function BookingList() {
                                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                                 />
                                 <label htmlFor="breakfast" className="ml-2 block text-sm text-gray-900 flex items-center">
-                                    <FiCoffee className="mr-1" /> Include Breakfast (+฿200)
+                                    <FiCoffee className="mr-1" /> Include Breakfast 
                                 </label>
                             </div>
                             
@@ -566,4 +594,5 @@ export default function BookingList() {
             )}
         </div>
     );
+
 }

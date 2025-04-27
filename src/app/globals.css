@@ -48,6 +48,15 @@
   100% { transform: scale(1); opacity: 1; }
 }
 
+.flex {
+  display: flex;
+}
+.justify-center {
+  justify-content: center;
+}
+.mt-8 {
+  margin-top: 2rem;
+}
 .animate-popIn {
   animation: popIn 0.3s ease-out forwards;
 }

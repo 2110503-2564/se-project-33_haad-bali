@@ -44,3 +44,10 @@ cypress.config.ts
 /tests
 jest.config.js
 jest.setup.js
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
