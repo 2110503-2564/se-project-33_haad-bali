@@ -41,7 +41,6 @@ src/components/*.cy.tsx
 cypress.config.ts
 
 #jess
-/tests
 jest.config.js
 jest.setup.js
 
