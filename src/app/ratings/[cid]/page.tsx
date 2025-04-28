@@ -38,7 +38,7 @@ export default function RatingPage({ params }: { params: { cid: string } }) {
     const session = await getSession();
     const token = (session?.user as any)?.token;
 
-    if (value && reviewText.trim().length <500 && token) {
+    if (value && reviewText.trim().length <=500 && token) {
       try {
         const response = await addReview(token, params.cid, { text: reviewText, star: value });
         if (response.success) {
@@ -51,8 +51,10 @@ export default function RatingPage({ params }: { params: { cid: string } }) {
         console.error('Error submitting review:', error);
         alert('Error submitting review.');
       }
-    } else {
+    } else if(value && reviewText.trim().length >500 && token){
       alert('Please do not enter more than 500 characters');
+    } else {
+      alert('Please add a rating');
     }
   };
 
