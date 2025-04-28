@@ -579,7 +579,7 @@ export default function Booking() {
       transition={{ type: "spring", stiffness: 200 }}
       className="bg-gradient-to-br from-white via-gray-100 to-gray-50 rounded-3xl shadow-2xl p-10 w-[90vw] max-w-5xl max-h-[90vh] overflow-y-auto relative"
     >
-      {/* Elegant Close Button */}
+      {/* Close Button */}
       <button
         onClick={() => setShowPromotionPopup(false)}
         className="absolute top-6 right-6 p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors border border-gray-300 shadow-sm"
@@ -600,70 +600,102 @@ export default function Booking() {
             No promotions available at the moment.
           </div>
         ) : (
-          promotions.map((promo) => (
-            <motion.div
-              key={promo._id}
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300 }}
-              className="flex flex-col sm:flex-row items-center justify-between p-6 sm:p-8 bg-white rounded-2xl border border-dashed border-gray-400 shadow hover:shadow-xl transition-all relative"
-            >
-              {/* Left: Coupon Badge */}
-              <div className="flex flex-col items-center justify-center px-6 py-4 rounded-2xl bg-gradient-to-br from-green-100 via-green-200 to-green-100 shadow-md">
-                <span className="text-xs font-semibold text-green-600 uppercase tracking-wide mb-1">
-                  Save
-                </span>
-                <span className="text-4xl sm:text-5xl font-extrabold text-gray-800 leading-none">
-                  {promo.discountPercentage}%
-                </span>
-                <span className="text-xs font-semibold text-green-600 mt-1">
-                  OFF
-                </span>
-              </div>
-
-
-              {/* Middle: Promo Code */}
-              <div className="flex flex-col items-center justify-center mb-6 sm:mb-0">
-                <span className="text-sm font-medium text-gray-500 mb-1">
-                  Promo Code
-                </span>
-                <div className="text-2xl sm:text-3xl font-extrabold text-gray-800 tracking-widest">
-                  {promo.promotionCode}
-                </div>
-              </div>
-
-              {/* Right: Apply Button */}
-              <motion.button
-                onClick={() => handleApplyPromotion(promo)}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-32 sm:w-36 py-3 text-sm font-bold uppercase bg-gradient-to-r from-black to-gray-800 text-white rounded-xl border-2 border-black hover:bg-white hover:text-black transition-all tracking-wider"
+          promotions.map((promo) => {
+            const isExpired = new Date(promo.expiredDate) < new Date();
+            
+            return (
+              <motion.div
+                key={promo._id}
+                whileHover={{ scale: isExpired ? 1 : 1.02 }}
+                transition={{ type: "spring", stiffness: 300 }}
+                className={`flex flex-col sm:flex-row items-center justify-between p-6 sm:p-8 rounded-2xl border border-dashed shadow transition-all relative ${
+                  isExpired 
+                    ? 'bg-gray-100 border-gray-300 text-gray-400'
+                    : 'bg-white border-gray-400 hover:shadow-xl'
+                }`}
               >
-                Apply
-              </motion.button>
+                {/* Left: Coupon Badge */}
+                <div className={`flex flex-col items-center justify-center px-6 py-4 rounded-2xl shadow-md ${
+                  isExpired
+                    ? 'bg-gradient-to-br from-gray-200 via-gray-300 to-gray-200'
+                    : 'bg-gradient-to-br from-green-100 via-green-200 to-green-100'
+                }`}>
+                  <span className={`text-xs font-semibold uppercase tracking-wide mb-1 ${
+                    isExpired ? 'text-gray-500' : 'text-green-600'
+                  }`}>
+                    Save
+                  </span>
+                  <span className={`text-4xl sm:text-5xl font-extrabold leading-none ${
+                    isExpired ? 'text-gray-500' : 'text-gray-800'
+                  }`}>
+                    {promo.discountPercentage}%
+                  </span>
+                  <span className={`text-xs font-semibold mt-1 ${
+                    isExpired ? 'text-gray-500' : 'text-green-600'
+                  }`}>
+                    OFF
+                  </span>
+                </div>
 
-              {/* Valid Until - Underneath on mobile */}
-              <div className="absolute bottom-3 left-6 text-xs sm:text-sm text-gray-400 sm:static sm:mt-4">
-                Valid until {new Date(promo.expiredDate).toLocaleDateString('en-UK', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-              </div>
-            </motion.div>
-          ))
+                {/* Middle: Promo Code */}
+                <div className="flex flex-col items-center justify-center mb-6 sm:mb-0">
+                  <span className={`text-sm font-medium mb-1 ${
+                    isExpired ? 'text-gray-400' : 'text-gray-500'
+                  }`}>
+                    Promo Code
+                  </span>
+                  <div className={`text-2xl sm:text-3xl font-extrabold tracking-widest ${
+                    isExpired ? 'text-gray-500' : 'text-gray-800'
+                  }`}>
+                    {promo.promotionCode}
+                  </div>
+                </div>
+
+                {/* Right: Apply Button or Expired Badge */}
+                {isExpired ? (
+                  <div className="w-32 sm:w-36 py-3 flex items-center justify-center">
+                    <span className="text-sm font-bold uppercase text-gray-500">
+                      Expired
+                    </span>
+                  </div>
+                ) : (
+                  <motion.button
+                    onClick={() => handleApplyPromotion(promo)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="w-32 sm:w-36 py-3 text-sm font-bold uppercase bg-gradient-to-r from-black to-gray-800 text-white rounded-xl border-2 border-black hover:bg-white hover:text-black transition-all tracking-wider"
+                  >
+                    Apply
+                  </motion.button>
+                )}
+
+                {/* Valid Until */}
+                <div className={`absolute bottom-3 left-6 text-xs sm:text-sm sm:static sm:mt-4 ${
+                  isExpired ? 'text-gray-400' : 'text-gray-500'
+                }`}>
+                  {isExpired ? 'Expired on ' : 'Valid until '}
+                  {new Date(promo.expiredDate).toLocaleDateString('en-UK', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </div>
+              </motion.div>
+            );
+          })
         )}
       </div>
     </motion.div>
     
-{user?.role === 'admin' && (
-  <AdminPromotionManagement 
-    promotions={promotions} 
-    onPromotionsUpdated={async () => {
-      const updatedPromotions = await getPromotions();
-      setPromotions(updatedPromotions.data);
-    }} 
-  />
-)}
+    {user?.role === 'admin' && (
+      <AdminPromotionManagement 
+        promotions={promotions} 
+        onPromotionsUpdated={async () => {
+          const updatedPromotions = await getPromotions();
+          setPromotions(updatedPromotions.data);
+        }} 
+      />
+    )}
   </div>
 )}
 

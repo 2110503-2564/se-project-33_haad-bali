@@ -6,6 +6,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]/authOptions";
 import NextAuthProvider from "@/providers/NextAuthProvider";
 import ReduxProvider from "@/redux/ReduxProvider";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -18,15 +21,28 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const nextAuthProvider = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions);
+  
   return (
     <html lang="en">
       <body className={inter.className}>
         <ReduxProvider>
-        <NextAuthProvider session={NextAuthProvider}>
-          <TopMenu session={nextAuthProvider}/>
-          {children}
-        </NextAuthProvider>
+          <NextAuthProvider session={session}>
+            <TopMenu session={session}/>
+            {children}
+            <ToastContainer 
+              position="top-right"
+              autoClose={5000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="light"
+            />
+          </NextAuthProvider>
         </ReduxProvider>
       </body>
     </html>
