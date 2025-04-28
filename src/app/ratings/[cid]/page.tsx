@@ -52,7 +52,7 @@ export default function RatingPage({ params }: { params: { cid: string } }) {
         alert('Error submitting review.');
       }
     } else {
-      alert('Please add a rating and a review.');
+      alert('Please do not enter more than 500 characters');
     }
   };
 
