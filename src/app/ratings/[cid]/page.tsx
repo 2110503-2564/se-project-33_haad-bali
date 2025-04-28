@@ -38,7 +38,7 @@ export default function RatingPage({ params }: { params: { cid: string } }) {
     const session = await getSession();
     const token = (session?.user as any)?.token;
 
-    if (value && reviewText.trim().length > 0 && token) {
+    if (value && reviewText.trim().length <500 && token) {
       try {
         const response = await addReview(token, params.cid, { text: reviewText, star: value });
         if (response.success) {
