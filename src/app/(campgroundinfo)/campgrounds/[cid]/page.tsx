@@ -394,7 +394,7 @@ export default function CampgroundDetailPage({ params }: { params: { cid: string
                   whileTap={{ scale: 0.95 }}
                   onClick={handleUpdateReview} 
                   className="px-4 py-2 bg-indigo-600 text-white rounded-lg"
-                  disabled={!newReviewText || newReviewStars === 0}
+                  disabled={ newReviewStars === 0}
                 >
                   Save Changes
                 </motion.button>
