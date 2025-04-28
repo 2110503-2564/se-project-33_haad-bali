@@ -606,17 +606,17 @@ export default function Booking() {
               className="flex flex-col sm:flex-row items-center justify-between p-6 sm:p-8 bg-white rounded-2xl border border-dashed border-gray-400 shadow hover:shadow-xl transition-all relative"
             >
               {/* Left: Coupon Badge */}
-                <div className="flex flex-col items-center justify-center px-6 py-4 border-2 border-dashed border-gray-400 rounded-2xl bg-white shadow-inner">
-                  <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
-                    Save
-                  </span>
-                  <span className="text-4xl sm:text-5xl font-extrabold text-green-500 leading-none">
-                    {promo.discountPercentage}%
-                  </span>
-                  <span className="text-xs font-semibold text-gray-400 mt-1">
-                    OFF
-                  </span>
-                </div>
+              <div className="flex flex-col items-center justify-center px-6 py-4 rounded-2xl bg-gradient-to-br from-green-100 via-green-200 to-green-100 shadow-md">
+                <span className="text-xs font-semibold text-green-600 uppercase tracking-wide mb-1">
+                  Save
+                </span>
+                <span className="text-4xl sm:text-5xl font-extrabold text-gray-800 leading-none">
+                  {promo.discountPercentage}%
+                </span>
+                <span className="text-xs font-semibold text-green-600 mt-1">
+                  OFF
+                </span>
+              </div>
 
 
               {/* Middle: Promo Code */}
