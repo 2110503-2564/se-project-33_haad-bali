@@ -568,84 +568,87 @@ export default function Booking() {
 
             
   
-      {showPromotionPopup && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
+{showPromotionPopup && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-md">
     <motion.div 
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ duration: 0.2 }}
-      className="bg-white rounded-lg shadow-2xl p-8 w-[90vw] max-w-6xl max-h-[90vh] overflow-y-auto relative"
+      transition={{ type: "spring", stiffness: 200 }}
+      className="bg-gradient-to-br from-white via-gray-100 to-gray-50 rounded-3xl shadow-2xl p-10 w-[90vw] max-w-5xl max-h-[90vh] overflow-y-auto relative"
     >
-      {/* Close X button */}
+      {/* Close Button */}
       <button
         onClick={() => setShowPromotionPopup(false)}
-        className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
+        className="absolute top-4 right-4 p-2 rounded-full bg-red-100 hover:bg-red-200 transition-colors shadow-md"
         aria-label="Close"
       >
-        <X className="w-10 h-10 text-red-500" />
+        <X className="w-8 h-8 text-red-500" />
       </button>
 
-      <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-center">
-  Available Promotions
-</h3>
+      {/* Title */}
+      <h3 className="text-3xl md:text-4xl font-extrabold mb-8 text-center text-gray-800 tracking-tight">
+        🎁 Available Promotions
+      </h3>
 
-<div className="grid grid-cols-1 gap-6">
-  {promotions.length === 0 ? (
-    <div className="text-center text-gray-500 text-base sm:text-lg md:text-xl font-medium py-12">
-      No promotions available at the moment.
-    </div>
-  ) : (
-    promotions.map((promo) => (
-      <motion.div
-  key={promo._id}
-  whileHover={{ scale: 1.02 }}
-  transition={{ type: "spring", stiffness: 300 }}
-  className="w-full h-48 border-2 border-gray-100 rounded-xl shadow-md flex items-center justify-between p-8 bg-gradient-to-r from-gray-50 to-white"
->
-  {/* Promo code + Divider */}
-  <div className="flex items-center gap-6">
-    <div className="flex flex-col items-start">
-      <span className="text-xs sm:text-sm font-semibold text-gray-500 mb-1">PROMO CODE</span>
-      <div className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-800">
-        {promo.promotionCode}
+      {/* Promotions List */}
+      <div className="grid grid-cols-1 gap-8">
+        {promotions.length === 0 ? (
+          <div className="text-center text-gray-500 text-lg font-medium py-20">
+            No promotions available at the moment.
+          </div>
+        ) : (
+          promotions.map((promo) => (
+            <motion.div
+              key={promo._id}
+              whileHover={{ scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 300 }}
+              className="flex flex-col sm:flex-row items-center justify-between p-6 sm:p-8 bg-white rounded-2xl border border-gray-200 shadow hover:shadow-xl transition-all"
+            >
+              {/* Promo Code */}
+              <div className="flex items-center gap-4 sm:gap-8 mb-6 sm:mb-0">
+                <div className="flex flex-col">
+                  <span className="text-xs font-semibold text-gray-400 uppercase">
+                    Promo Code
+                  </span>
+                  <span className="text-2xl sm:text-3xl font-bold text-gray-800">
+                    {promo.promotionCode}
+                  </span>
+                </div>
+                <div className="h-14 w-px bg-gray-300 hidden sm:block" />
+              </div>
+
+              {/* Discount Section */}
+              <div className="flex flex-col items-center mb-6 sm:mb-0">
+                <span className="text-3xl sm:text-4xl font-bold text-green-500">
+                  {promo.discountPercentage}% OFF
+                </span>
+                <span className="text-gray-500 text-sm sm:text-base mt-1">
+                  Valid until {new Date(promo.expiredDate).toLocaleDateString('en-UK', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </span>
+              </div>
+
+              {/* Apply Button */}
+              <motion.button
+                onClick={() => handleApplyPromotion(promo)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-32 sm:w-36 py-3 text-sm font-bold uppercase bg-black text-white rounded-xl border-2 border-black hover:bg-white hover:text-black transition-all tracking-wider"
+              >
+                Apply
+              </motion.button>
+            </motion.div>
+          ))
+        )}
       </div>
-    </div>
-    <div className="h-16 w-px bg-gray-300" />
-  </div>
-
-  {/* Discount block - nudged slightly right */}
-  <div className="flex flex-col items-center ml-4">
-    <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-green-600">
-      {promo.discountPercentage}% OFF
-    </span>
-    <div className="text-sm sm:text-base md:text-lg font-medium text-gray-500 mt-2 text-center">
-      Valid until: {new Date(promo.expiredDate).toLocaleDateString('en-UK', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      })}
-    </div>
-  </div>
-
-  {/* Apply button */}
-  <motion.button
-    onClick={() => handleApplyPromotion(promo)}
-    whileHover={{ scale: 1.05 }}
-    whileTap={{ scale: 0.95 }}
-    className="w-28 sm:w-32 py-3 sm:py-4 px-4 sm:px-6 text-sm sm:text-base font-bold bg-black text-white uppercase tracking-wider rounded-lg hover:bg-white hover:text-black border-2 border-black transition-all"
-  >
-    APPLY
-  </motion.button>
-</motion.div>
-
-    ))
-  )}
-</div>
-
     </motion.div>
   </div>
-)}s
+)}
+
     </div>
   );
 }
