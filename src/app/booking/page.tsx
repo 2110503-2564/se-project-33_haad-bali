@@ -577,17 +577,17 @@ export default function Booking() {
       transition={{ type: "spring", stiffness: 200 }}
       className="bg-gradient-to-br from-white via-gray-100 to-gray-50 rounded-3xl shadow-2xl p-10 w-[90vw] max-w-5xl max-h-[90vh] overflow-y-auto relative"
     >
-      {/* Close Button */}
+      {/* Elegant Close Button */}
       <button
         onClick={() => setShowPromotionPopup(false)}
-        className="absolute top-4 right-4 p-2 rounded-full bg-red-100 hover:bg-red-200 transition-colors shadow-md"
+        className="absolute top-6 right-6 p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors border border-gray-300 shadow-sm"
         aria-label="Close"
       >
-        <X className="w-8 h-8 text-red-500" />
+        <X className="w-6 h-6 text-gray-600" />
       </button>
 
       {/* Title */}
-      <h3 className="text-3xl md:text-4xl font-extrabold mb-8 text-center text-gray-800 tracking-tight">
+      <h3 className="text-3xl md:text-4xl font-extrabold mb-10 text-center text-gray-800 tracking-tight">
         🎁 Available Promotions
       </h3>
 
@@ -603,44 +603,49 @@ export default function Booking() {
               key={promo._id}
               whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300 }}
-              className="flex flex-col sm:flex-row items-center justify-between p-6 sm:p-8 bg-white rounded-2xl border border-gray-200 shadow hover:shadow-xl transition-all"
+              className="flex flex-col sm:flex-row items-center justify-between p-6 sm:p-8 bg-white rounded-2xl border border-dashed border-gray-400 shadow hover:shadow-xl transition-all relative"
             >
-              {/* Promo Code */}
-              <div className="flex items-center gap-4 sm:gap-8 mb-6 sm:mb-0">
-                <div className="flex flex-col">
-                  <span className="text-xs font-semibold text-gray-400 uppercase">
-                    Promo Code
+              {/* Left: Coupon Badge */}
+              <div className="flex items-center gap-4 sm:gap-6 mb-6 sm:mb-0">
+                <div className="flex flex-col items-center justify-center bg-gradient-to-br from-green-400 to-green-500 text-white rounded-xl px-6 py-4 shadow-md">
+                  <span className="text-xs sm:text-sm uppercase font-semibold tracking-wide">
+                    Save
                   </span>
-                  <span className="text-2xl sm:text-3xl font-bold text-gray-800">
-                    {promo.promotionCode}
+                  <span className="text-3xl sm:text-4xl font-bold">
+                    {promo.discountPercentage}%
                   </span>
+                  <span className="text-xs sm:text-sm mt-1">OFF</span>
                 </div>
-                <div className="h-14 w-px bg-gray-300 hidden sm:block" />
               </div>
 
-              {/* Discount Section */}
-              <div className="flex flex-col items-center mb-6 sm:mb-0">
-                <span className="text-3xl sm:text-4xl font-bold text-green-500">
-                  {promo.discountPercentage}% OFF
+              {/* Middle: Promo Code */}
+              <div className="flex flex-col items-center justify-center mb-6 sm:mb-0">
+                <span className="text-sm font-medium text-gray-500 mb-1">
+                  Promo Code
                 </span>
-                <span className="text-gray-500 text-sm sm:text-base mt-1">
-                  Valid until {new Date(promo.expiredDate).toLocaleDateString('en-UK', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </span>
+                <div className="text-2xl sm:text-3xl font-extrabold text-gray-800 tracking-widest">
+                  {promo.promotionCode}
+                </div>
               </div>
 
-              {/* Apply Button */}
+              {/* Right: Apply Button */}
               <motion.button
                 onClick={() => handleApplyPromotion(promo)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-32 sm:w-36 py-3 text-sm font-bold uppercase bg-black text-white rounded-xl border-2 border-black hover:bg-white hover:text-black transition-all tracking-wider"
+                className="w-32 sm:w-36 py-3 text-sm font-bold uppercase bg-gradient-to-r from-black to-gray-800 text-white rounded-xl border-2 border-black hover:bg-white hover:text-black transition-all tracking-wider"
               >
                 Apply
               </motion.button>
+
+              {/* Valid Until - Underneath on mobile */}
+              <div className="absolute bottom-3 left-6 text-xs sm:text-sm text-gray-400 sm:static sm:mt-4">
+                Valid until {new Date(promo.expiredDate).toLocaleDateString('en-UK', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </div>
             </motion.div>
           ))
         )}
