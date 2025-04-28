@@ -141,10 +141,10 @@ export default function CampgroundDetailPage({ params }: { params: { cid: string
   const handleUpdateReview = async () => {
     const session = await getSession();
     const token = (session?.user as any)?.token;
-    if (currentReview && newReviewText && newReviewStars > 0) {
+    if (true) {
       try {
         await updateReview(token, currentReview._id, { 
-          text: newReviewText,
+          text: newReviewText||'',
           star: newReviewStars 
         });
         const updatedReviews = await getACampgroundReviews(params.cid);
@@ -383,7 +383,7 @@ export default function CampgroundDetailPage({ params }: { params: { cid: string
                 ))}
               </div>
               <textarea
-                value={newReviewText}
+                value={newReviewText||""}
                 onChange={(e) => setNewReviewText(e.target.value)}
                 className="w-full p-4 border rounded-lg mb-4"
                 rows={4}
@@ -394,7 +394,6 @@ export default function CampgroundDetailPage({ params }: { params: { cid: string
                   whileTap={{ scale: 0.95 }}
                   onClick={handleUpdateReview} 
                   className="px-4 py-2 bg-indigo-600 text-white rounded-lg"
-                  disabled={ newReviewStars === 0}
                 >
                   Save Changes
                 </motion.button>
