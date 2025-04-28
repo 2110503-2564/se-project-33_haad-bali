@@ -243,70 +243,93 @@ export default function Booking() {
   const makeBooking = async () => {
     if (!validateForm()) return;
     if (!checkInDate || !checkOutDate) return;
-
-    const checkInDateISO = checkInDate.toISOString();
-    const checkOutDateISO = checkOutDate.toISOString();
-
-    const selectedCampground = campgrounds.find(camp => camp.id === bookLocation);
-    if (!selectedCampground) {
-      toast.error("Invalid campground selection");
-      return;
-    }
-
+  
     try {
       const session = await getSession();
-      const token = (session?.user as any)?.token;
-
-      if (token) {
-        // Apply promotion at booking time
-        let finalPrice = originalPrice + breakfastPrice;
-        if (selectedPromotion) {
-          const promotionResult = await applyPromotion(
-            token,
-            selectedPromotion.promotionCode,
-            originalPrice
-          );
+      if (!session) {
+        toast.error("You need to be logged in");
+        return;
+      }
+  
+      const token = (session.user as any)?.token;
+      const selectedCampground = campgrounds.find(camp => camp.id === bookLocation);
+      
+      if (!selectedCampground) {
+        toast.error("Invalid campground selection");
+        return;
+      }
+  
+      // Calculate base price (using Dayjs)
+      const nights = checkOutDate.diff(checkInDate, 'day');
+      const basePrice = selectedCampground.pricePerNight * nights;
+      
+      // Calculate breakfast cost
+      const breakfastCost = (campgroundHasBreakfast && breakfast) ? breakfastPrice : 0;
+  
+      // Initialize final price
+      let finalPrice = basePrice + breakfastCost;
+      let appliedDiscount = 0;
+  
+      // Apply promotion if available and valid
+      if (selectedPromotion) {
+        const now = dayjs();
+        const promoExpiry = dayjs(selectedPromotion.expiredDate);
+        
+        // Check if promotion is still valid
+        if (now.isBefore(promoExpiry) || now.isSame(promoExpiry, 'day')) {
+          // Calculate discount amount (only on base price, not breakfast)
+          appliedDiscount = basePrice * (selectedPromotion.discountPercentage / 100);
+          finalPrice = (basePrice - appliedDiscount) + breakfastCost;
           
-          if (promotionResult) {
-            finalPrice = promotionResult.discountedPrice + breakfastPrice;
-          }
-        }
-
-        const bookingItem: BookingItem = {
-          _id: "",
-          CheckInDate: checkInDateISO,
-          CheckOutDate: checkOutDateISO,
-          tel: tel,
-          campground: selectedCampground,
-          breakfast: campgroundHasBreakfast ? breakfast : false,
-          apptDate: new Date().toISOString(),
-          user: "",
-          totalPrice: finalPrice
-        };
-
-        dispatch(addBooking(bookingItem));
-
-        const response = await createBooking(token, {
-          nameLastname,
-          tel,
-          campground: selectedCampground.id,
-          CheckInDate: checkInDateISO,
-          CheckOutDate: checkOutDateISO,
-          userId: (session?.user as any)?.id,
-          breakfast: campgroundHasBreakfast ? breakfast : false,
-          totalPrice: finalPrice
-        });
-
-        if (response.success) {
-          console.log("Booking successful!");
+          console.log(`Applied discount: ${appliedDiscount}`, {
+            basePrice,
+            discountPercentage: selectedPromotion.discountPercentage,
+            breakfastCost,
+            finalPrice
+          });
           
+          toast.success(`Applied ${selectedPromotion.discountPercentage}% discount!`);
         } else {
-          toast.error(response.message || "Booking failed");
+          toast.warning("Promotion has expired");
+          setSelectedPromotion(null);
         }
-        window.location.href = '/mybooking';
+      }
+  
+      // Create booking payload
+      const bookingData = {
+        nameLastname,
+        tel,
+        campground: selectedCampground.id,
+        CheckInDate: checkInDate.toISOString(),
+        CheckOutDate: checkOutDate.toISOString(),
+        userId: (session.user as any)?.id,
+        breakfast: campgroundHasBreakfast ? breakfast : false,
+        totalPrice: finalPrice,
+        promotionCode: selectedPromotion?.promotionCode,
+        discountApplied: appliedDiscount
+      };
+  
+      // Dispatch to Redux
+      dispatch(addBooking({
+        ...bookingData,
+        _id: "", // Temporary ID
+        campground: selectedCampground,
+        apptDate: new Date().toISOString(),
+        user: (session.user as any)?.id || ""
+      }));
+  
+      // Send to backend
+      const response = await createBooking(token, bookingData);
+  
+      if (response.success) {
+        toast.success("Booking created successfully!");
+        console.log("Final price with discount:", response);
+      } else {
+        toast.error(response.message || "Booking failed");
       }
     } catch (error) {
-      toast.error("Booking error occurred");
+      console.error("Booking error:", error);
+      toast.error("An error occurred while processing your booking");
     }
   };
   return (
