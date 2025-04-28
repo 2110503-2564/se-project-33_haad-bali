@@ -13,7 +13,15 @@ export interface CampgroundItem {
   __v: number;
   id: string;
 }
-
+// interface.ts
+export interface UserProfile {
+  name: string;
+  username: string;
+  email: string;
+  tel: string;
+  createdAt: string;
+  role: 'user' | 'admin';
+}
 export interface CampgroundsJson {
   success: boolean;
   count: number;
@@ -50,5 +58,6 @@ export interface PromotionItem {
   discountPercentage:number,
   expiredDate: string | number | Date,
   minSpend:number,
-  usedCount:number
+  usedCount:number,
+  maxUses:number
 }

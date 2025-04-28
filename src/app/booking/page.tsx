@@ -19,6 +19,7 @@ import { motion } from "framer-motion";
 import { X } from "lucide-react"; 
 import applyPromotion from "@/libs/applyPromotion";
 import router, { useRouter } from "next/router";
+import AdminPromotionManagement from "@/components/AdminPromotionManagement";
 export default function Booking() {
   const urlParams = useSearchParams();
   const cid = urlParams.get('id');
@@ -34,7 +35,7 @@ export default function Booking() {
   const [bookLocation, setBookLocation] = useState<string>('');
   const [nameLastname, setNameLastname] = useState<string>('');
   const [tel, setTel] = useState<string>('');
-  const [user, setUser] = useState<{ name: string; username: string; email: string; tel: string; createdAt: string } | null>(null);
+  const [user, setUser] = useState<{ name: string; username: string; email: string; tel: string; createdAt: string ; role:string} | null>(null);
   const [checkInDate, setCheckInDate] = useState<Dayjs | null>(null);
   const [checkOutDate, setCheckOutDate] = useState<Dayjs | null>(null);
   const [breakfast, setBreakfast] = useState<boolean>(false);
@@ -100,6 +101,7 @@ export default function Booking() {
             email: profile.data.email,
             tel: profile.data.telephone,
             createdAt: profile.data.createdAt,
+            role: profile.data.role 
           });
           setNameLastname(profile.data.name);
           setTel(profile.data.telephone);
@@ -652,6 +654,16 @@ export default function Booking() {
         )}
       </div>
     </motion.div>
+    
+{user?.role === 'admin' && (
+  <AdminPromotionManagement 
+    promotions={promotions} 
+    onPromotionsUpdated={async () => {
+      const updatedPromotions = await getPromotions();
+      setPromotions(updatedPromotions.data);
+    }} 
+  />
+)}
   </div>
 )}
 
