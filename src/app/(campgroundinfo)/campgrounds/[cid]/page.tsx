@@ -316,6 +316,7 @@ export default function CampgroundDetailPage({ params }: { params: { cid: string
                       <motion.button 
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
+                        name='Edit'
                         onClick={() => handleEditReview(review)}
                       >
                         <FiEdit className="text-blue-600" />
@@ -323,6 +324,7 @@ export default function CampgroundDetailPage({ params }: { params: { cid: string
                       <motion.button 
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
+                         name='Delete'
                         onClick={() => handleDeleteReview(review._id)}
                       >
                         <FiTrash2 className="text-red-600" />
@@ -392,7 +394,8 @@ export default function CampgroundDetailPage({ params }: { params: { cid: string
                 <motion.button 
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={handleUpdateReview} 
+                  onClick={handleUpdateReview}
+                  name='Save Changes' 
                   className="px-4 py-2 bg-indigo-600 text-white rounded-lg"
                 >
                   Save Changes
